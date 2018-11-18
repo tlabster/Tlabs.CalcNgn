@@ -81,7 +81,7 @@ namespace Tlabs.CalcNgn.Tests {
     [Fact]
     public void DataExportTest() {
       var calcMod= cngn.LoadModel(createCalcSheet());
-      // calcMod.SaveCopy("D:\\calcngn0.xls");
+      calcMod.SaveCopy(Path.Combine(App.ContentRoot, "calcngn0.xls"));
       calcMod.Data= new Dictionary<string, object> {
         ["data"]= TABvals
       };
@@ -126,7 +126,7 @@ namespace Tlabs.CalcNgn.Tests {
       wks.Cells["A6"].Formula= "A6!!!";
       wks.Cells["A6"].AddComment("@Data_Export(CELL, data.export.A6)");
 
-      wks.Cells["D10"].AddComment("@Data_Import(BEGIN, data) @Data_Export(TABLE, data.export.table)");
+      wks.Cells["D10"].AddComment("@Data_Import(BEGIN, data, 3) @Data_Export(TABLE, data.export.table)");
       wbk.Names.Add("EXPORT_RNG", "=" + wksName + "!" + "$D$10:$F$11");
       Assert.NotNull(wks.Cells["D10"].Comment);
       wks.Cells["D9"].Formula= "prop01";
@@ -145,10 +145,14 @@ namespace Tlabs.CalcNgn.Tests {
 
     [Fact]
     public void LoadModelTest() {
-      using (var strm= new FileStream("D:\\tmp\\OPP-FILTER.xls", FileMode.Open)) {
+      var calcMod= cngn.LoadModel(createCalcSheet());
+      var modelPath= Path.Combine(App.ContentRoot, "calcngn0.xls");
+      calcMod.SaveCopy(modelPath);
+
+      using (var strm= new FileStream(modelPath, FileMode.Open)) {
         var memstrm= new MemoryStream();
         strm.CopyTo(memstrm);
-        var calcMod= cngn.LoadModel(strm);
+        calcMod= cngn.LoadModel(strm);
 
         Assert.True(calcMod.Definition.Imports.Count > 0);
         Assert.NotEmpty(calcMod.Definition.Imports);
