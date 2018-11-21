@@ -71,7 +71,7 @@ namespace Tlabs.CalcNgn.Sgear {
     private static readonly string EXPORT_PATTERN= Parser.CmdTokenizer.GetCommand(TemplateDirectives.DATA_EXPORT);
 
     /// <summary>Ctor from <paramref name="culture"/>.</summary>
-    public CalcNgnModelParser(CultureInfo culture= null) : base(culture) { }
+    public CalcNgnModelParser(CultureInfo culture= null, string licKey= null) : base(culture, licKey) { }
 
     /// <inherit/>
     protected override void ParseWorkbook(IWorkbook wbk, out IDictionary<string, IModelImport> imp, out IDictionary<string, IModelExport> exp) {

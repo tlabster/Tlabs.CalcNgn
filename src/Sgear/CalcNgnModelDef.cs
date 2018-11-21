@@ -90,10 +90,11 @@ namespace Tlabs.CalcNgn.Sgear {
       /// <summary>Workbook set.</summary>
       protected IWorkbookSet wbSet;
 
-      /// <summary>Ctor from <paramref name="culture"/>.</summary>
-      protected AbstractModelParser(CultureInfo culture) {
+      /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
+      protected AbstractModelParser(CultureInfo culture= null, string licKey= null) {
         try { //ensure licence
-          Factory.SetSignedLicense("SpreadsheetGear.License, Type=Standard, Hash=aiwZIy8On2qfzyoNK64Eqmk, Product=NST, NewVersionsUntil=2019-06-04, Company=Tomorrow Labs GmbH, Email=p.oltmanns@tomorrowlabs.io, Signature=I7b/hDUp/VgSyKK0qo2P+FIfyDbFx/qyn0/D1VifbJkA#xatGw3JAizFv76MwMv96/QiZkZodf6TYeo2056WK8OkA#J");
+          if (null != licKey)
+            Factory.SetSignedLicense(licKey);
         }
         catch (Exception e) when (Misc.Safe.NoDisastrousCondition(e)) { }
 
