@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../Tlabs.Core/src/Tlabs.Core.csproj" />
+    <ProjectReference Include="../../Tlabs.Data/src/Tlabs.Data.csproj" />
   </ItemGroup>
   
 </Project>
