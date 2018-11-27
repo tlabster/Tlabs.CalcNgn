@@ -12,13 +12,9 @@ namespace Tlabs.CalcNgn.Tests {
   using Xunit;
 
   public class CalcNgnTest {
-    private Calculator cngn= new Calculator(new Sgear.CalcNgnModelParser());
-    public CalcNgnTest() {
-      try {
-        Factory.SetSignedLicense("SpreadsheetGear.License, Type=Standard, Hash=aiwZIy8On2qfzyoNK64Eqmk, Product=NST, NewVersionsUntil=2019-06-04, Company=Tomorrow Labs GmbH, Email=p.oltmanns@tomorrowlabs.io, Signature=I7b/hDUp/VgSyKK0qo2P+FIfyDbFx/qyn0/D1VifbJkA#xatGw3JAizFv76MwMv96/QiZkZodf6TYeo2056WK8OkA#J");
-      }
-      catch (Exception e) when (Misc.Safe.NoDisastrousCondition(e)) { }
-    }
+    // private SpreadsheetGear Licence:
+    const string CALCNGN_LIC= "SpreadsheetGear.License, Type=Standard, Hash=aiwZIy8On2qfzyoNK64Eqmk, Product=NST, NewVersionsUntil=2019-06-04, Company=Tomorrow Labs GmbH, Email=p.oltmanns@tomorrowlabs.io, Signature=I7b/hDUp/VgSyKK0qo2P+FIfyDbFx/qyn0/D1VifbJkA#xatGw3JAizFv76MwMv96/QiZkZodf6TYeo2056WK8OkA#J";
+    private Calculator cngn= new Calculator(new Sgear.CalcNgnModelParser(null, CALCNGN_LIC));
 
     static DataTable TABvals= new List<object> {
         new Dictionary<string, object> {["prop01"]= 1.1, ["prop02"]= "Aaaa", ["prop03"]= 10.0},
