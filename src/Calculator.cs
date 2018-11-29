@@ -32,7 +32,7 @@ namespace Tlabs.CalcNgn {
       private Intern.ICalcNgnModelDef modelDef;
 
       /// <summary>Ctor from <paramref name="modelDef"/>.</summary>
-      public Model(Intern.ICalcNgnModelDef modelDef) {
+      internal Model(Intern.ICalcNgnModelDef modelDef) {
         this.modelDef= modelDef;
       }
 
@@ -56,7 +56,7 @@ namespace Tlabs.CalcNgn {
         }
       }
 
-      /// <summary>Exports model (data) provided into <paramref name="data"/>.</summary>
+      /// <summary>Exports model (data) into provided <paramref name="data"/>.</summary>
       public DataDictionary ExportInto(DataDictionary data) {
         string k;
         object xVal= null;
