@@ -8,10 +8,10 @@ using Tlabs.CalcNgn;
 using Tlabs.Data.Entity;
 using Tlabs.Data.Serialize;
 
-namespace Tlabs.Data.Processing {
+namespace Tlabs.Data.Processing.Intern {
 
   /// <summary><see cref="DocSchemaProcessor"/> to perform <see cref="Calculator.Model"/> specific document computation(s).</summary>
-  public class DocSchemaCalcProcessor : DocSchemaProcessor {
+  internal class DocSchemaCalcProcessor : DocSchemaProcessor {
 
     private Calculator.Model calcNgnModel;
 

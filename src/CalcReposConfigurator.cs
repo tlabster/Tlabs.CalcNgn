@@ -36,7 +36,7 @@ namespace Tlabs.CalcNgn {
     public void AddTo(IServiceCollection services, IConfiguration cfg) {
       services.TryAddSingleton<CalcNgn.Calculator>();
       services.TryAddSingleton<CalcNgn.Intern.ICalcNgnModelParser>((svcProv) => new CalcNgn.Sgear.CalcNgnModelParser(this.calcNgnCulture, this.calcNgnLicense));
-      services.AddScoped(typeof(DocCalcProcessorRepo));
+      services.AddScoped<IDocProcessorRepo, DocCalcProcessorRepo>();
       log.LogDebug("Calc. repository services added.");
     }
 
