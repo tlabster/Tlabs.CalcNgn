@@ -4,10 +4,10 @@ using Tlabs.Data.Entity;
 
 namespace Tlabs.Data.Processing {
 
-  ///<summary>Repository of <see cref="DocSchemaCalcProcessor"/>.</summary>
-  public class DocCalcProcessorRepo : Intern.AbstractDocProcRepo<DocSchemaCalcProcessor> {
+  ///<summary>Repository of <see cref="Intern.DocSchemaCalcProcessor"/>.</summary>
+  internal class DocCalcProcessorRepo : Intern.AbstractDocProcRepo {
     private Tlabs.CalcNgn.Calculator calcNgn;
-    private static readonly BasicCache<string, DocSchemaCalcProcessor> schemaCache= new BasicCache<string, DocSchemaCalcProcessor>();
+    private static readonly BasicCache<string, IDocSchemaProcessor> schemaCache= new BasicCache<string, IDocSchemaProcessor>();
 
     ///<summary>Ctor from services.</summary>
     public DocCalcProcessorRepo(Repo.IDocSchemaRepo schemaRepo,
@@ -20,7 +20,7 @@ namespace Tlabs.Data.Processing {
     }
 
     ///<inherit/>
-    protected override DocSchemaCalcProcessor createProcessor(DocumentSchema schema) => new DocSchemaCalcProcessor(schema, docClassFactory, docSeri, calcNgn);
+    protected override IDocSchemaProcessor createProcessor(DocumentSchema schema) => new Intern.DocSchemaCalcProcessor(schema, docClassFactory, docSeri, calcNgn);
   }
 
 

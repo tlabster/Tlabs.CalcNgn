@@ -234,4 +234,4 @@ _Pvt_Extensions
 .fake/
 
 # coverlet test code coverage
-coverage.json
+tst/coverage.json
