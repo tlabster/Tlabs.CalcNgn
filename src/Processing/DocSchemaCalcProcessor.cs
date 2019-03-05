@@ -32,17 +32,19 @@ namespace Tlabs.Data.Processing.Intern {
     ///<summary>Perform any calc. model specific computation(s).</summary>
     protected override object processBodyObject(object bodyObj, Func<object, IDictionary<string, object>> setupData) {
       if (null == calcNgnModel) return bodyObj;
-      var model=   null != setupData
-                 ? setupData(bodyObj)
-                 : bodyAccessor.ToDictionary(bodyObj);
+      lock(calcNgnModel) {
+        var model=   null != setupData
+                  ? setupData(bodyObj)
+                  : bodyAccessor.ToDictionary(bodyObj);
 #if DEBUG
-      SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", schema.TypeName + "0.xls"));
+        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", schema.TypeName + "0.xls"));
 #endif
-      calcNgnModel.Compute(model);
+        calcNgnModel.Compute(model);
 #if DEBUG
-      SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", schema.TypeName + ".xls"));
+        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", schema.TypeName + ".xls"));
 #endif
-      return bodyObj;
+        return bodyObj;
+      }
     }
 
     private void SaveModel(string path) {
