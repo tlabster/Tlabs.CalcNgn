@@ -15,17 +15,17 @@ namespace Tlabs.Data.Processing.Intern {
 
     private Calculator.Model calcNgnModel;
 
-    /// <summary>Ctor from <paramref name="schema"/>, <paramref name="docClassFactory"/>, <paramref name="docSeri"/> and <paramref name="calcNgn"/>.</summary>
-    public DocSchemaCalcProcessor(DocumentSchema schema, IDocumentClassFactory docClassFactory, IDynamicSerializer docSeri, Calculator calcNgn)
-    : base(schema, docClassFactory, docSeri) {
+    /// <summary>Ctor from <paramref name="compSchema"/>, <paramref name="docSeri"/> and <paramref name="calcNgn"/>.</summary>
+    public DocSchemaCalcProcessor(ICompiledDocSchema compSchema, IDynamicSerializer docSeri, Calculator calcNgn)
+    : base(compSchema, docSeri) {
       if (null == calcNgn) throw new ArgumentNullException(nameof(calcNgn));
 
-      if (schema.HasCalcModel) {    // check calc model
-        this.calcNgnModel= calcNgn.LoadModel(schema.CalcModelStream);
+      if (Schema.HasCalcModel) {    // check calc model
+        this.calcNgnModel= calcNgn.LoadModel(Schema.CalcModelStream);
         var impCnt= calcNgnModel.Definition.Imports.Count;
         var expCnt= calcNgnModel.Definition.Exports.Count;
-        DocSchemaProcessor.Log.LogDebug("{schema} has {imp} import(s) and {exp} export(s).", schema.TypeId, impCnt, expCnt);
-        if (0 == impCnt + expCnt) DocSchemaProcessor.Log.LogWarning("No data import/export definition found in calcModel of {schema}.", schema.TypeId);
+        DocSchemaProcessor.Log.LogDebug("{schema} has {imp} import(s) and {exp} export(s).", Schema.TypeId, impCnt, expCnt);
+        if (0 == impCnt + expCnt) DocSchemaProcessor.Log.LogWarning("No data import/export definition found in calcModel of {schema}.", Schema.TypeId);
       }
     }
 
@@ -35,13 +35,13 @@ namespace Tlabs.Data.Processing.Intern {
       lock(calcNgnModel) {
         var model=   null != setupData
                   ? setupData(bodyObj)
-                  : bodyAccessor.ToDictionary(bodyObj);
+                  : BodyAccessor.ToDictionary(bodyObj);
 #if DEBUG
-        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", schema.TypeName + "0.xls"));
+        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", Schema.TypeName + "0.xls"));
 #endif
         calcNgnModel.Compute(model);
 #if DEBUG
-        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", schema.TypeName + ".xls"));
+        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", Schema.TypeName + ".xls"));
 #endif
         return bodyObj;
       }
