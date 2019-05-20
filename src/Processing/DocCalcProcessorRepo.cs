@@ -20,7 +20,8 @@ namespace Tlabs.Data.Processing {
     }
 
     ///<inherit/>
-    protected override IDocSchemaProcessor createProcessor(DocumentSchema schema) => new Intern.DocSchemaCalcProcessor(schema, docClassFactory, docSeri, calcNgn);
+    protected override IDocSchemaProcessor createProcessor<TVx, TCx>(DocumentSchema schema, TVx vx, TCx cx)
+      => new Intern.DocSchemaCalcProcessor(new Intern.CompiledDocSchema<TVx, TCx>(schema, docClassFactory, vx, cx), docSeri, calcNgn);
   }
 
 
