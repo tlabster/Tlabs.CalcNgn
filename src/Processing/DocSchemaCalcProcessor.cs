@@ -24,8 +24,8 @@ namespace Tlabs.Data.Processing.Intern {
         this.calcNgnModel= calcNgn.LoadModel(Schema.CalcModelStream);
         var impCnt= calcNgnModel.Definition.Imports.Count;
         var expCnt= calcNgnModel.Definition.Exports.Count;
-        DocSchemaProcessor.Log.LogDebug("{schema} has {imp} import(s) and {exp} export(s).", Schema.TypeId, impCnt, expCnt);
-        if (0 == impCnt + expCnt) DocSchemaProcessor.Log.LogWarning("No data import/export definition found in calcModel of {schema}.", Schema.TypeId);
+        DocSchemaProcessor.log.LogDebug("{schema} has {imp} import(s) and {exp} export(s).", Schema.TypeId, impCnt, expCnt);
+        if (0 == impCnt + expCnt) DocSchemaProcessor.log.LogWarning("No data import/export definition found in calcModel of {schema}.", Schema.TypeId);
       }
     }
 
