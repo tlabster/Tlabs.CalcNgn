@@ -13,15 +13,16 @@ namespace Tlabs.Data.Processing {
     public DocCalcProcessorRepo(Repo.IDocSchemaRepo schemaRepo,
                             IDocumentClassFactory docClassFactory,
                             Serialize.IDynamicSerializer docSeri,
+                            SchemaCtxDescriptorResolver ctxDescResolver,
                             Tlabs.CalcNgn.Calculator calcNgn)
-    : base(schemaRepo, docClassFactory, docSeri)
+    : base(schemaRepo, docClassFactory, docSeri, ctxDescResolver)
     {
       this.calcNgn= calcNgn;
     }
 
     ///<inherit/>
-    protected override IDocSchemaProcessor createProcessor<TVx, TCx>(DocumentSchema schema, TVx vx, TCx cx)
-      => new Intern.DocSchemaCalcProcessor(new Intern.CompiledDocSchema<TVx, TCx>(schema, docClassFactory, vx, cx), docSeri, calcNgn);
+    protected override IDocSchemaProcessor createProcessor(Intern.ICompiledDocSchema compSchema)
+      => new Intern.DocSchemaCalcProcessor(compSchema, docSeri, calcNgn);
   }
 
 
