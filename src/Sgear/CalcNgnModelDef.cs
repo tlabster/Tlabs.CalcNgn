@@ -6,9 +6,7 @@ using System.Globalization;
 
 using Microsoft.Extensions.Logging;
 using SpreadsheetGear;
-using SpreadsheetGear.Shapes;
 
-using Tlabs.Misc;
 using Tlabs.CalcNgn.Intern;
 
 namespace Tlabs.CalcNgn.Sgear {
@@ -25,13 +23,13 @@ namespace Tlabs.CalcNgn.Sgear {
       this.exports= new ReadOnlyDictionary<string, IModelExport>(exp);
     }
 
-    /// <inherit/>
+    /// <inheritdoc/>
     public string Name => wbk.Name;
 
-    /// <inherit/>
+    /// <inheritdoc/>
     public IReadOnlyDictionary<string, IModelImport> Imports { get; }
 
-    /// <inherit/>
+    /// <inheritdoc/>
     public IReadOnlyDictionary<string, IModelExport> Exports {
       get {
         wbk.WorkbookSet.Calculate();
@@ -39,13 +37,13 @@ namespace Tlabs.CalcNgn.Sgear {
       }
     }
 
-    /// <inherit/>
+    /// <inheritdoc/>
     public void WriteStream(Stream strm) {
       wbk.WorkbookSet.Calculate();
       wbk.SaveToStream(strm, FileFormat.Excel8);
     }
 
-    /// <inherit/>
+    /// <inheritdoc/>
     public string NamedValuesPrefix {
       get { return namedValPrefix; }
       set {
@@ -54,7 +52,7 @@ namespace Tlabs.CalcNgn.Sgear {
       }
     }
 
-    /// <inherit/>
+    /// <inheritdoc/>
     public void ImportNamedValues(DataDictionary namedVals) {
       IRange rng= null;
       string rngKey= "?";
@@ -84,14 +82,20 @@ namespace Tlabs.CalcNgn.Sgear {
 
     }
 
+    ///<inheritdoc/>
+    public void Dispose() {
+      if (null != wbk) wbk.Close();
+      wbk= null;
+    }
 
-    /// <summary>Abstract base impl. of a <see cref="Intern.ICalcNgnModelParser"/>.</summary>
-    public abstract class AbstractModelParser : Intern.ICalcNgnModelParser, IDisposable {
+
+    /// <summary>Abstract table data and calculation model.</summary>
+    public abstract class AbstractModel : IDisposable {
       /// <summary>Workbook set.</summary>
       protected IWorkbookSet wbSet;
 
       /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
-      protected AbstractModelParser(CultureInfo culture= null, string licKey= null) {
+      protected AbstractModel(CultureInfo culture= null, string licKey= null) {
         try { //ensure licence
           if (null != licKey)
             Factory.SetSignedLicense(licKey);
@@ -110,7 +114,23 @@ namespace Tlabs.CalcNgn.Sgear {
         this.wbSet.ReadVBA= false;
       }
 
-      /// <inherit/>
+      /// <inheritdoc/>
+      public void Dispose() {
+        var wbs= this.wbSet;
+        if (null != wbs) {
+          wbs.Workbooks.Close(); //close all
+          this.wbSet= wbs= null;
+        }
+      }
+
+    }
+
+    /// <summary>Abstract base impl. of a <see cref="Intern.ICalcNgnModelParser"/>.</summary>
+    public abstract class AbstractModelParser : AbstractModel, Intern.ICalcNgnModelParser, IDisposable {
+      /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
+      protected AbstractModelParser(CultureInfo culture= null, string licKey= null) : base(culture, licKey) { }
+
+      /// <inheritdoc/>
       public ICalcNgnModelDef ParseModelStream(Stream modelStream) {
         IDictionary<string, IModelImport> imp;
         IDictionary<string, IModelExport> exp;
@@ -119,17 +139,9 @@ namespace Tlabs.CalcNgn.Sgear {
         return new CalcNgnModelDef(wbk, imp, exp);
       }
 
-      /// <inherit/>
+      /// <inheritdoc/>
       protected abstract void ParseWorkbook(IWorkbook wbk, out IDictionary<string, IModelImport> imp, out IDictionary<string, IModelExport> exp);
 
-      /// <inherit/>
-      public void Dispose() {
-        var wbs= this.wbSet;
-        if (null != wbs) {
-          wbs.Workbooks.Close(); //close all
-          this.wbSet= wbs= null;
-        }
-      }
     }
 
   }

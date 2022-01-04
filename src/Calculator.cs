@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Globalization;
 
 using Microsoft.Extensions.Logging;
-using SpreadsheetGear;
-using SpreadsheetGear.Shapes;
 
 using Tlabs.Misc;
 
@@ -27,7 +24,7 @@ namespace Tlabs.CalcNgn {
     }
 
     /// <summary>Calculation model (spreadsheet abstraction used as computation/business logic).</summary>
-    public class Model {
+    public class Model : IDisposable {
       private static readonly ILogger log= App.Logger<Calculator>();
       private Intern.ICalcNgnModelDef modelDef;
 
@@ -81,6 +78,11 @@ namespace Tlabs.CalcNgn {
         ExportInto(data);
       }
 
+      ///<inheritdoc/>
+      public void Dispose() {
+        if (null != modelDef) modelDef.Dispose();
+        modelDef= null;
+      }
     }//clas Model
   } //class CalcNgn
 
