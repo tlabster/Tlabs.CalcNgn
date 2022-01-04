@@ -11,7 +11,7 @@ namespace Tlabs.CalcNgn.Intern {
   }
 
   /// <summary><see cref="Calculator.Model"/> definition.</summary>
-  public interface ICalcNgnModelDef {
+  public interface ICalcNgnModelDef : IDisposable {
     /// <summary>Model name (calc. workbook name).</summary>
     string Name { get; }
     /// <summary>Read-only dictionary of <see cref="IModelImport"/>.</summary>
