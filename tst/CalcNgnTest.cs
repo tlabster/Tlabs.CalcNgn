@@ -17,10 +17,10 @@ namespace Tlabs.CalcNgn.Tests {
     private Calculator cngn= new Calculator(new Sgear.CalcNgnModelParser(null, CALCNGN_LIC));
 
     static DataTable TABvals= new List<object> {
-        new Dictionary<string, object> {["prop01"]= 1.1, ["prop02"]= "Aaaa", ["prop03"]= 10.0},
-        new Dictionary<string, object> {["prop01"]= 2.2, ["prop02"]= "Bbbb", ["prop03"]= 20.0},
-        new Dictionary<string, object> {["prop01"]= 3.3, ["prop02"]= "Cccc", ["prop03"]= 30.0},
-        new Dictionary<string, object> {["prop01"]= 4.4, ["prop02"]= "Dddd", ["prop03"]= 40.0}
+        new Dictionary<string, object> {["prop01"]= 1.1, ["prop02"]= "Aaaa", ["frml"]= "dummy", ["prop03"]= 10.0},
+        new Dictionary<string, object> {["prop01"]= 2.2, ["prop02"]= "Bbbb", ["frml"]= "dummy", ["prop03"]= 20.0},
+        new Dictionary<string, object> {["prop01"]= 3.3, ["prop02"]= "Cccc", ["frml"]= "dummy", ["prop03"]= 30.0},
+        new Dictionary<string, object> {["prop01"]= 4.4, ["prop02"]= "Dddd", ["frml"]= "dummy", ["prop03"]= 40.0}
       }.AsDataTable();
 
 
@@ -70,7 +70,8 @@ namespace Tlabs.CalcNgn.Tests {
       Assert.Equal(2.2, wks.Cells["D11"].Value);
       Assert.Equal(3.3, wks.Cells["D12"].Value);
       Assert.Equal(4.4, wks.Cells["F1"].Value);
-      Assert.Equal(330.0, wks.Cells["B9"].Value);
+      Assert.Equal(11.1, wks.Cells["F10"].Value);
+      Assert.Equal(366.3, wks.Cells["B9"].Value);
     }
 
 
@@ -81,7 +82,7 @@ namespace Tlabs.CalcNgn.Tests {
       calcMod.Data= new Dictionary<string, object> {
         ["data"]= TABvals
       };
-      // calcMod.SaveCopy("D:\\calcngn.xls");
+      calcMod.SaveCopy(Path.Combine(App.ContentRoot, "calcngn.xls"));
 
       var exportData= calcMod.Data;
       object vo;
@@ -122,14 +123,16 @@ namespace Tlabs.CalcNgn.Tests {
       wks.Cells["A6"].Formula= "A6!!!";
       wks.Cells["A6"].AddComment("@Data_Export(CELL, data.export.A6)");
 
-      wks.Cells["D10"].AddComment("@Data_Import(BEGIN, data, 3) @Data_Export(TABLE, data.export.table)");
+      wks.Cells["D10"].AddComment("@Data_Import(BEGIN, data, 4) @Data_Export(TABLE, data.export.table)");
       wbk.Names.Add("EXPORT_RNG", "=" + wksName + "!" + "$D$10:$F$11");
       Assert.NotNull(wks.Cells["D10"].Comment);
       wks.Cells["D9"].Formula= "prop01";
       wks.Cells["E9"].Formula= "prop02";
-      wks.Cells["F9"].Formula= "prop03";
+      wks.Cells["F9"].Formula= "frml";
+      wks.Cells["G9"].Formula= "prop03";
 
       wks.Cells["B10"].Formula= "=D10 * F10";
+      wks.Cells["F10"].Formula= "=D10 + G10";
       wks.Cells["B9"].Formula= "=SUM(B10:B11)";
       wks.Cells["F1"].Formula= "=D11";
       // wks.Cells["H15"].Formula= "X";    //extend used range

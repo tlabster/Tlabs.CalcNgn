@@ -22,8 +22,7 @@ namespace Tlabs.CalcNgn.Util {
       foreach (object jobj in lst) {
         DataRow tabRow= table.NewRow();
 
-        var dict= jobj as IDictionary<string, object>;
-        if (null != dict)
+        if (jobj is IDictionary<string, object> dict)
           rowFromDictionary(tabRow, dict, tabCols);
         else
           rowFromList(tabRow, jobj, tabCols);

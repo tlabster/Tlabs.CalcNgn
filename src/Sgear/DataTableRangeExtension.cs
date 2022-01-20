@@ -36,16 +36,16 @@ namespace Tlabs.CalcNgn.Sgear {
       int startRow= rng.Row;
       int hdrRow= startRow -1;
       IValues cells= (IValues)rng.Worksheet;
-      string[] hdr= null;
+      var hdr= new List<string>(rng.ColumnCount);
 
       if (hasHeader) {
         if (hdrRow < 0) throw new ArgumentException("No header above range.");
-        hdr= new string[nCols];
-        for (int l= 0; l < nCols; ++l)
-          if (null == (hdr[l]= cells[hdrRow, startCol+l]?.Text)) {
-            nCols= l;
-            break;//throw new CalcNgnCellException(hdrRow, startCol+l, "No header key");
-          }
+        for (int l= 0; l < rng.ColumnCount; ++l) {
+          var h= cells[hdrRow, startCol+l]?.Text;
+          if (null == h) break; //throw new CalcNgnCellException(hdrRow, startCol+l, "No header key");
+          hdr.Add(data.Columns.Contains(h) ? h : null);
+        }
+        nCols= hdr.Count;
       }
       int endCol= startCol + nCols;
       int endRow= startRow + nRows;
@@ -68,8 +68,10 @@ namespace Tlabs.CalcNgn.Sgear {
       for (int r= startRow; r < endRow; ++r) {
         var row= data.Rows[r-startRow];
         for (int c= startCol; c < endCol; ++c) {
+          var cv= cells[r, c];
+          if (null != cv && cv.HasFormula) continue; //fill non-formula cells only
           var ci= c-startCol;
-          var val= (hasHeader ? row[hdr[ci]] : row[ci]) as IConvertible;
+          var val= (hasHeader ? (null != hdr[ci] ? row[hdr[ci]] : null) : row[ci]) as IConvertible;
           var tc= val?.GetTypeCode();
 
           if (tc >= TypeCode.SByte && tc <= TypeCode.Decimal)
@@ -86,6 +88,13 @@ namespace Tlabs.CalcNgn.Sgear {
       }
     }
 
+    public static void ClearValues(this IRange rng) {
+      IValues cells= (IValues)rng.Worksheet;
+      for (int r= rng.Row, rcnt= rng.RowCount; r < rcnt; ++r) {
+        for (int c= rng.Column, ccnt= rng.ColumnCount; c < ccnt && !cells[r, c].HasFormula; ++c)
+          cells.Clear(r, c);
+      }
+    }
 
     public static DataTable GetDataTable(this IRange rng, bool hasHeader) {
       int nCols= rng.ColumnCount;
