@@ -20,7 +20,7 @@ namespace Tlabs.Data.Processing {
       this.calcNgn= calcNgn;
     }
 
-    ///<inherit/>
+    ///<inheritdoc/>
     protected override IDocSchemaProcessor createProcessor(Intern.ICompiledDocSchema compSchema)
       => new Intern.DocSchemaCalcProcessor(compSchema, docSeri, calcNgn);
   }

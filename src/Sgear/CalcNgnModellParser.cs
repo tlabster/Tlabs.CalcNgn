@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Globalization;
 
-using Microsoft.Extensions.Logging;
 using SpreadsheetGear;
-using SpreadsheetGear.Shapes;
 
-using Tlabs.Misc;
 using Tlabs.CalcNgn.Intern;
 
 namespace Tlabs.CalcNgn.Sgear {
   using CommentParser = Tlabs.CalcNgn.Parser.CmdParser;
-  using DataDictionary = IDictionary<string, object>;
   using DataTable = System.Data.DataTable;
   using System.Globalization;
   using Tlabs.CalcNgn.Util;
@@ -73,7 +67,7 @@ namespace Tlabs.CalcNgn.Sgear {
     /// <summary>Ctor from <paramref name="culture"/>.</summary>
     public CalcNgnModelParser(CultureInfo culture= null, string licKey= null) : base(culture, licKey) { }
 
-    /// <inherit/>
+    /// <inheritdoc/>
     protected override void ParseWorkbook(IWorkbook wbk, out IDictionary<string, IModelImport> imp, out IDictionary<string, IModelExport> exp) {
       var parsedWbk= new ParsedWbk(wbk);
       imp= parsedWbk.impDefs;
