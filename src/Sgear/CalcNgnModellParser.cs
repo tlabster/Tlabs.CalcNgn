@@ -205,7 +205,7 @@ namespace Tlabs.CalcNgn.Sgear {
       public string id;
       public IRange startCell;
       public DataImportParamTokens Type;
-      public int colCnt;
+      public int colCnt { get; }
       public int rowCnt;
 
       public ImportDef(string id, IRange cell, DataImportParamTokens type, int collCnt) { this.id= id; this.startCell= cell; this.Type= type; this.colCnt= collCnt; }
@@ -258,7 +258,7 @@ namespace Tlabs.CalcNgn.Sgear {
         }
 
         IRange rng= startCell[0, 0, rngRows-1, Math.Max(colCnt-1, 0)];
-        rng.ClearContents();
+        rng.ClearValues();  //rng.ClearContents();
 
         if (rowCnt > 0 && dataTab.Rows.Count > rng.RowCount) {
           /* If DataTable row count > fix target range, shrink a copy of the table to fit

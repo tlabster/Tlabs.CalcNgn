@@ -33,8 +33,12 @@ namespace Tlabs.CalcNgn.Sgear {
     }
 
     public static IRange DataRange(this IRange hdrRng) {
-      var endRng= hdrRng.EndDown;
-      var dataRng= hdrRng.Worksheet.Cells[hdrRng.Row+1, hdrRng.Column, endRng.Row, hdrRng.Column + hdrRng.ColumnCount-1];
+      var startCell= hdrRng[1, 0];  //row below of header
+      if (null == startCell.Value)
+        startCell= hdrRng.EndDown;  //first non empty row below header
+      var endCell= startCell.EndDown;
+
+      var dataRng= hdrRng.Worksheet.Cells[startCell.Row, hdrRng.Column, endCell.Row, hdrRng.Column + hdrRng.ColumnCount-1];
       log.LogDebug("Data range identified: {addr}", dataRng.RelativeAddr());
       return dataRng;
     }
