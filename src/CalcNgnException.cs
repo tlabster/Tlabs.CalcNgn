@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Tlabs.CalcNgn {
   /// <summary>Exception thrown from a calc-engine.</summary>
@@ -15,6 +12,19 @@ namespace Tlabs.CalcNgn {
 
     /// <summary>Ctor from message and inner exception.</summary>
     public CalcNgnException(string message, Exception e) : base(message, e) { }
+  }
+
+  /// <summary>Exception thrown from a calc-engine.</summary>
+  public class CalcNgnModelException : CalcNgnException {
+
+    /// <summary>Default ctor</summary>
+    public CalcNgnModelException() : base() { }
+
+    /// <summary>Ctor from message</summary>
+    public CalcNgnModelException(string message) : base(message) { }
+
+    /// <summary>Ctor from message and inner exception.</summary>
+    public CalcNgnModelException(string message, Exception e) : base(message, e) { }
   }
 
   /// <summary>Exception thrown from a calc-engine cell.</summary>

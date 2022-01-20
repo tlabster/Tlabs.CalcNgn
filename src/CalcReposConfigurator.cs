@@ -32,7 +32,7 @@ namespace Tlabs.CalcNgn {
 
     private ILogger log= App.Logger<CalcReposConfigurator>();
 
-    ///<inherit/>
+    ///<inheritdoc/>
     public void AddTo(IServiceCollection services, IConfiguration cfg) {
       services.TryAddSingleton<CalcNgn.Calculator>();
       services.TryAddSingleton<CalcNgn.Intern.ICalcNgnModelParser>((svcProv) => new CalcNgn.Sgear.CalcNgnModelParser(this.calcNgnCulture, this.calcNgnLicense));
