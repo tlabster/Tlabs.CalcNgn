@@ -52,7 +52,8 @@ namespace Tlabs.CalcNgn.Tests {
 
     [Fact]
     public void TableImpTest() {
-      var calcMod= cngn.LoadModel(createCalcSheet());
+      var calcMod= cngn.LoadModel(createCalcSheet(withColumnSpec: false));
+      // calcMod.SaveCopy(Path.Combine(App.ContentRoot, "calcngn0.xls"));
 
       calcMod.Data= new Dictionary<string, object> {
         ["data"]= TABvals
@@ -99,9 +100,11 @@ namespace Tlabs.CalcNgn.Tests {
       Assert.IsType<DataTable>(vo);
       var tab= (DataTable)vo;
       Assert.Equal(4, tab.Rows.Count);
+      var row= tab.Rows[3];
+      Assert.Equal(double.Parse(row[2].ToString()), double.Parse(row[0].ToString()) + double.Parse(row[3].ToString()));
     }
 
-    private Stream createCalcSheet() {
+    private Stream createCalcSheet(bool withColumnSpec= true) {
       MemoryStream strm= new MemoryStream(20 * 1024);
       IWorkbook wbk= Factory.GetWorkbook();
       IWorksheet wks= wbk.Worksheets[0];
@@ -123,8 +126,8 @@ namespace Tlabs.CalcNgn.Tests {
       wks.Cells["A6"].Formula= "A6!!!";
       wks.Cells["A6"].AddComment("@Data_Export(CELL, data.export.A6)");
 
-      wks.Cells["D10"].AddComment("@Data_Import(BEGIN, data, 4) @Data_Export(TABLE, data.export.table)");
-      wbk.Names.Add("EXPORT_RNG", "=" + wksName + "!" + "$D$10:$F$11");
+      wks.Cells["D10"].AddComment($"@Data_Import(BEGIN, data{(withColumnSpec ? ", 4" : "")}) @Data_Export(TABLE, data.export.table)");
+      wbk.Names.Add("EXPORT_RNG", "=" + wksName + "!" + "$D$10:$G$11");
       Assert.NotNull(wks.Cells["D10"].Comment);
       wks.Cells["D9"].Formula= "prop01";
       wks.Cells["E9"].Formula= "prop02";
