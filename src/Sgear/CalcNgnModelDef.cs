@@ -127,6 +127,8 @@ namespace Tlabs.CalcNgn.Sgear {
 
     /// <summary>Abstract base impl. of a <see cref="Intern.ICalcNgnModelParser"/>.</summary>
     public abstract class AbstractModelParser : AbstractModel, Intern.ICalcNgnModelParser, IDisposable {
+      /// <summary>Logger</summary>
+      protected static readonly ILogger log= App.Logger<AbstractModelParser>();
       /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
       protected AbstractModelParser(CultureInfo culture= null, string licKey= null) : base(culture, licKey) { }
 

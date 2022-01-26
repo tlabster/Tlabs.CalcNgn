@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 using SpreadsheetGear;
 
@@ -112,7 +113,7 @@ namespace Tlabs.CalcNgn.Sgear {
         var collCnt= 0;
         if (impParam.Count < minArgCnt) throw new CalcNgnException($"Wrong number of arguments for {cmd} in {cell.SheetAddress()}");
         DataImportParamTokens impType= (DataImportParamTokens)Enum.Parse(typeof(DataImportParamTokens), impParam[0], true);
-        if (impType == DataImportParamTokens.BEGIN && impParam.Count != minArgCnt + 1) throw new CalcNgnException($"Wrong number of arguments for {cmd} in {cell.SheetAddress()}");
+        if (impType == DataImportParamTokens.BEGIN && impParam.Count > minArgCnt + 1) throw new CalcNgnException($"Wrong number of arguments for {cmd} in {cell.SheetAddress()}");
         string impID= impParam[1].Trim();
 
         if (impType == DataImportParamTokens.END) {
@@ -133,7 +134,16 @@ namespace Tlabs.CalcNgn.Sgear {
             if (   impDef.Type == impType
                 && cell.Worksheet.Index == impDef.startCell.Worksheet.Index) throw new CalcNgnException($"Duplicate {cmd} BEGIN in {cell.SheetAddress()}, only one import BEGIN per sheet supported.");
           }
-          if (!Int32.TryParse(impParam[2].Trim(), out collCnt)) throw new CalcNgnException($"Invalid column count parameter for {cmd} in {cell.SheetAddress()}.");
+          if (impParam.Count > minArgCnt) {
+            if (!Int32.TryParse(impParam[2].Trim(), out collCnt)) throw new CalcNgnException($"Invalid column count parameter for {cmd} in {cell.SheetAddress()}.");
+          }
+          else {
+            // No column count specified. Try to obtain from range:
+            IName rngName= lookupRngName(cell);
+            log.LogWarning("Determine import area columns count from range: {rng}", rngName.Name);
+            collCnt= rngName.RefersToRange.ColumnCount;
+          }
+          log.LogInformation("Import area {id} has {n} columns.", impID, collCnt);
         }
 
         this.impDefs[impID]= new ImportDef(impID, cell, impType, collCnt);
