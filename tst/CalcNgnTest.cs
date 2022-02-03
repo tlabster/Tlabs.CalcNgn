@@ -164,8 +164,34 @@ namespace Tlabs.CalcNgn.Tests {
       }
     }
 
-  }
+    [Fact]
+    public void ExportNamesTest() {
+      var calcMod= cngn.LoadModel(createCalcSheet());
+      // calcMod.SaveCopy(Path.Combine(App.ContentRoot, "calcngn0.xls"));
+      calcMod.Data= new Dictionary<string, object> {
+        ["data"]= TABvals
+      };
+      // calcMod.SaveCopy(Path.Combine(App.ContentRoot, "calcngn.xls"));
 
+      var exportData= calcMod.Data;
+      string prop;
+      object o;
+      IDictionary<string, object> dict;
+
+      Assert.True(exportData.TryResolveValue("data", out o, out prop));
+      dict= o as IDictionary<string, object>;
+      Assert.NotNull(dict);
+      Assert.True(dict.ContainsKey("export"));
+
+      Assert.True(dict.TryResolveValue("export", out o, out prop));
+      dict= o as IDictionary<string, object>;
+      Assert.True(dict.ContainsKey("table"));
+
+      Assert.True(exportData.TryResolveValue("data.export", out o, out prop));
+      Assert.True(exportData.TryResolveValue("data.export.table", out o, out prop));
+
+    }
+  }
   public static class CalcNgnModelExt {
     public static void SaveCopy(this Calculator.Model cmod, string path) {
       using (var strm= File.Create(path)) {
