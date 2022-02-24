@@ -111,6 +111,7 @@ namespace Tlabs.CalcNgn.Sgear {
         var impParam= parserResult[cmd];
         var minArgCnt= 2;
         var collCnt= 0;
+        var hasHeader= true;
         if (impParam.Count < minArgCnt) throw new CalcNgnException($"Wrong number of arguments for {cmd} in {cell.SheetAddress()}");
         DataImportParamTokens impType= (DataImportParamTokens)Enum.Parse(typeof(DataImportParamTokens), impParam[0], true);
         if (impType == DataImportParamTokens.BEGIN && impParam.Count > minArgCnt + 1) throw new CalcNgnException($"Wrong number of arguments for {cmd} in {cell.SheetAddress()}");
@@ -134,10 +135,15 @@ namespace Tlabs.CalcNgn.Sgear {
             if (   impDef.Type == impType
                 && cell.Worksheet.Index == impDef.startCell.Worksheet.Index) throw new CalcNgnException($"Duplicate {cmd} BEGIN in {cell.SheetAddress()}, only one import BEGIN per sheet supported.");
           }
-          if (impParam.Count > minArgCnt) {
-            if (!Int32.TryParse(impParam[2].Trim(), out collCnt)) throw new CalcNgnException($"Invalid column count parameter for {cmd} in {cell.SheetAddress()}.");
+
+          for (int pi= 2, pn= Math.Min(impParam.Count, 4); pi < pn; ++pi) {
+            var h= hasHeader;
+            if (!bool.TryParse(impParam[pi].Trim(), out hasHeader)) {
+              hasHeader= h;
+              if (!Int32.TryParse(impParam[2].Trim(), out collCnt)) throw new CalcNgnException($"Invalid column count parameter for {cmd} in {cell.SheetAddress()}.");
+            }
           }
-          else {
+          if (0 == collCnt) {
             // No column count specified. Try to obtain from range:
             IName rngName= lookupRngName(cell);
             log.LogWarning("Determine import area columns count from range: {rng}", rngName.Name);
@@ -146,7 +152,7 @@ namespace Tlabs.CalcNgn.Sgear {
           log.LogInformation("Import area {id} has {n} columns.", impID, collCnt);
         }
 
-        this.impDefs[impID]= new ImportDef(impID, cell, impType, collCnt);
+        this.impDefs[impID]= new ImportDef(impID, cell, impType, collCnt, hasHeader);
       }
 
       public void ParseExportCmd(object src, String cmd, IDictionary<String, IList<string>> parserResult, int row, int col) {
@@ -217,8 +223,9 @@ namespace Tlabs.CalcNgn.Sgear {
       public DataImportParamTokens Type;
       public int colCnt { get; }
       public int rowCnt;
+      public bool hasHeader;
 
-      public ImportDef(string id, IRange cell, DataImportParamTokens type, int collCnt) { this.id= id; this.startCell= cell; this.Type= type; this.colCnt= collCnt; }
+      public ImportDef(string id, IRange cell, DataImportParamTokens type, int collCnt, bool hasHeader) { this.id= id; this.startCell= cell; this.Type= type; this.colCnt= collCnt; this.hasHeader= hasHeader; }
 
       public void Input(object data) {
         if (this.Type == DataImportParamTokens.CELL) {
@@ -279,7 +286,7 @@ namespace Tlabs.CalcNgn.Sgear {
             dataTab.Rows.RemoveAt(dataTab.Rows.Count-1);
         }
 
-        rng.CopyFromDataTable(dataTab, insRows, hasHeader: true);
+        rng.CopyFromDataTable(dataTab, insRows, hasHeader);
         if (rowCnt < 1)
           rowCnt= -dataTab.Rows.Count;      //mark ImportDef to clear shrink dynamic target range
       }
