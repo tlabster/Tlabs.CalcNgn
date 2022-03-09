@@ -117,7 +117,8 @@ namespace Tlabs.CalcNgn.Sgear {
       for (int l = 0; l < nCols; ++l)
         tabCols.Add(new DataColumn(  hasHeader
                                    ? cells[hdrRow, startCol+l].Text
-                                   : $"_c{l}"));    //default DataType is string
+                                   : $"_c{l}",
+                                   typeof(object)));
 
       //export table
       for (int r = startRow; r < endRow; ++r) {
@@ -143,7 +144,7 @@ namespace Tlabs.CalcNgn.Sgear {
               val= ERRmap[(int)cell.Error];
             break;
           }
-          tabRow[ci]= val?.ToString(CultureInfo.InvariantCulture);
+          tabRow[ci]= val;    //val?.ToString(CultureInfo.InvariantCulture);
         }
       }
       return table;
