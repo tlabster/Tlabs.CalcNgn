@@ -302,7 +302,7 @@ namespace Tlabs.CalcNgn.Sgear {
           object v= null;
           double? num;
           if (null == rng) return v;
-          
+
           if (1 == rng.CellCount || rng.MergeCells) {
             v= rng.Value;
             if (   type == typeof(DateTime?)
