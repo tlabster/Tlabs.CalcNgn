@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Collections.Generic;
+using System.Globalization;
 
 using Microsoft.Extensions.Logging;
 using SpreadsheetGear;
@@ -116,7 +117,7 @@ namespace Tlabs.CalcNgn.Sgear {
       for (int l = 0; l < nCols; ++l)
         tabCols.Add(new DataColumn(  hasHeader
                                    ? cells[hdrRow, startCol+l].Text
-                                   : $"_c{l}"));
+                                   : $"_c{l}"));    //default DataType is string
 
       //export table
       for (int r = startRow; r < endRow; ++r) {
@@ -124,7 +125,7 @@ namespace Tlabs.CalcNgn.Sgear {
         table.Rows.Add(tabRow);
         for (int c= startCol, ci= 0; c < endCol; ++c, ++ci) {
           var cell= cells[r, c];
-          object val= null;
+          IConvertible val= null;
           if (null != cell) switch (cell.Type) {
             case CellType.Text: 
               val= cell.Text;
@@ -142,7 +143,7 @@ namespace Tlabs.CalcNgn.Sgear {
               val= ERRmap[(int)cell.Error];
             break;
           }
-          tabRow[ci]= val;
+          tabRow[ci]= val?.ToString(CultureInfo.InvariantCulture);
         }
       }
       return table;
