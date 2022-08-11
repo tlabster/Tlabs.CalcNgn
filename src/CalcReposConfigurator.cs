@@ -13,9 +13,9 @@ namespace Tlabs.CalcNgn {
 
   ///<summary>Configures all data repositories as services.</summary>
   public class CalcReposConfigurator : IConfigurator<IServiceCollection> {
-    // IDictionary<string, string> config;
-    CultureInfo calcNgnCulture;
-    string calcNgnLicense;
+    static readonly ILogger log= App.Logger<CalcReposConfigurator>();
+    readonly CultureInfo calcNgnCulture;
+    readonly string calcNgnLicense;
 
 
     ///<summary>Default ctor</summary>
@@ -23,14 +23,12 @@ namespace Tlabs.CalcNgn {
 
     ///<summary>Ctor from <paramref name="config"/>.</summary>
     public CalcReposConfigurator(IDictionary<string, string> config) {
-      config= config ?? new Dictionary<string, string>(0);
-      string val;
-      if (config.TryGetValue("culture", out val))
+      config??= new Dictionary<string, string>(0);
+      if (config.TryGetValue("culture", out var val))
         this.calcNgnCulture= new CultureInfo(val);
       config.TryGetValue("licKey", out this.calcNgnLicense);
     }
 
-    private ILogger log= App.Logger<CalcReposConfigurator>();
 
     ///<inheritdoc/>
     public void AddTo(IServiceCollection services, IConfiguration cfg) {

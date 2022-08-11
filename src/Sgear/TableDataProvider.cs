@@ -26,8 +26,7 @@ public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
         return tableData;
       }
       finally {
-        if (null != wbk) wbk.Close();
-        wbk= null;
+        wbk?.Close();
       }
     }
 
@@ -35,8 +34,8 @@ public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
     public IRowData ReadRowDataWithHeader(Stream dataStream, IEnumerable<string> header) => new RowData(ReadDataWithHeader(dataStream, header), header);
 
     class RowData : IRowData {
-      object[,] data;
-      IEnumerable<string> header;
+      readonly object[,] data;
+      readonly IEnumerable<string> header;
       IReadOnlyDictionary<string, int> hdrIdx;
       public RowData(object[,] data, IEnumerable<string> header) {
         this.data= data;
@@ -50,7 +49,7 @@ public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
       public IReadOnlyDictionary<string, int> HeaderIndex {
         get {
           var idx= 0;
-          return hdrIdx ?? (hdrIdx= header.ToDictionary(hdr => hdr, _=> idx++));  //defer index creation on demand
+          return hdrIdx??= header.ToDictionary(hdr => hdr, _=> idx++);  //defer index creation on demand
         }
       } 
     }

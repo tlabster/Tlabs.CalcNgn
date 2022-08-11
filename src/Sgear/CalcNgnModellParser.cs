@@ -56,13 +56,13 @@ namespace Tlabs.CalcNgn.Sgear {
       ["DATETIME"]= typeof(DateTime?)
     };
 
-    private static readonly string IMPORT_CMD= Enum.GetName(typeof(TemplateDirectives), TemplateDirectives.DATA_IMPORT);
+    // private static readonly string IMPORT_CMD= Enum.GetName(typeof(TemplateDirectives), TemplateDirectives.DATA_IMPORT);
     private static readonly string IMPORT_PATTERN= Parser.CmdTokenizer.GetCommand(TemplateDirectives.DATA_IMPORT);
 #if Shape_support
     private static readonly string SHAPE_CMD= Enum.GetName(typeof(TemplateDirectives), TemplateDirectives.DynamicAutoShape);
     private static readonly string SHAPE_PATTERN= Parser.CmdTokenizer.GetCommand(TemplateDirectives.DynamicAutoShape);
 #endif
-    private static readonly string EXPORT_CMD= Enum.GetName(typeof(TemplateDirectives), TemplateDirectives.DATA_EXPORT);
+    // private static readonly string EXPORT_CMD= Enum.GetName(typeof(TemplateDirectives), TemplateDirectives.DATA_EXPORT);
     private static readonly string EXPORT_PATTERN= Parser.CmdTokenizer.GetCommand(TemplateDirectives.DATA_EXPORT);
 
     /// <summary>Ctor from <paramref name="culture"/>.</summary>
@@ -119,9 +119,8 @@ namespace Tlabs.CalcNgn.Sgear {
 
         if (impType == DataImportParamTokens.END) {
           string matchingCmd= Parser.CmdTokenizer.GetCommand(TemplateDirectives.DATA_IMPORT, DataImportParamTokens.BEGIN);
-          IModelImport modImp;
-          matchingCmd= matchingCmd.Substring(0, matchingCmd.Length-1) + ", \"" + impID + "\")";
-          if (!this.impDefs.TryGetValue(impID, out modImp)) throw new CalcNgnException($"Data import end in {cell.SheetAddress()} not matching {matchingCmd}");
+          matchingCmd= $"{matchingCmd[..^1]}, \"{impID}\")";  //matchingCmd.Substring(0, matchingCmd.Length-1) + ", \"" + impID + "\")";
+          if (!this.impDefs.TryGetValue(impID, out var modImp)) throw new CalcNgnException($"Data import end in {cell.SheetAddress()} not matching {matchingCmd}");
           var idef= (ImportDef)modImp;
           if (idef.startCell.Row >= cell.Row) throw new CalcNgnException($"Data import end in {cell.SheetAddress()} has to be below of {matchingCmd}");
           if (idef.startCell.Column != cell.Column) throw new CalcNgnException($"Data import end in {cell.SheetAddress()} has to be in same column as {matchingCmd}");
@@ -158,10 +157,10 @@ namespace Tlabs.CalcNgn.Sgear {
       public void ParseExportCmd(object src, String cmd, IDictionary<String, IList<string>> parserResult, int row, int col) {
         var cell= currSheet.Cells[row, col];
         var param= parserResult[cmd];
-        if (param.Count < 2 || param.Count > 3) throw new CalcNgnException(string.Format("Wrong arguments number for {0} in cell[{1:D}, {2:D}]", cmd, cell.Row, cell.Column));
+        if (param.Count < 2 || param.Count > 3) throw new CalcNgnException($"Wrong arguments number for {cmd} in cell[{cell.Row:D}, {cell.Column:D}]");
         DataExportParamTokens expType= (DataExportParamTokens)Enum.Parse(typeof(DataExportParamTokens), param[0], true);
 
-        if (String.IsNullOrWhiteSpace(param[1])) throw new CalcNgnException(string.Format("Bad data key {0} in cell[{1:D}, {2:D}]", cmd, cell.Row, cell.Column));
+        if (String.IsNullOrWhiteSpace(param[1])) throw new CalcNgnException($"Bad data key {cmd} in cell[{cell.Row:D}, {cell.Column:D}]");
         var dataKey= param[1].Trim();
         
         Type targetType= null;
@@ -244,11 +243,13 @@ namespace Tlabs.CalcNgn.Sgear {
               startCell.Value= ValueError.Value;
               return;
             }
-            lst= new object[0];
+            lst= Array.Empty<object>(); //new object[0]
           }
+#pragma warning disable CA2000    // DataTable suppress finalization in their constructors – this is why calling Dispose() on them explicitly does nothing.
           dataTab= lst.AsDataTable();
+#pragma warning restore CA2000
         }
-        
+
         int rngRows= rowCnt;
         // int rngCols= 0 == colCnt ? (colCnt= dataTab.Columns.Count) : colCnt;
         bool insRows= false;
@@ -313,7 +314,7 @@ namespace Tlabs.CalcNgn.Sgear {
 
           if (hasHeader)
             rng= rng[-1, 0, rng.RowCount-1, rng.ColumnCount-1]; //extend range to header
-          return v= rng.GetDataTable(hasHeader);
+          return rng.GetDataTable(hasHeader);
         }
       }
     }//class ExportDef

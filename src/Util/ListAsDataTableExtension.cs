@@ -53,9 +53,7 @@ namespace Tlabs.CalcNgn.Util {
     }
 
     private static void rowFromList(DataRow tabRow, object obj, DataColumnCollection colDef) {
-      var lst= obj as IList<object>;
-
-      if (null == lst) return;
+      if (obj is not IList<object> lst) return;
 
       if (null != colDef) {
         /* Setup table schema (columns) from first list entry
@@ -64,7 +62,7 @@ namespace Tlabs.CalcNgn.Util {
         var row= new object[lst.Count];
         for (int l= 0; l < lst.Count; ++l) {
           var v= row[l]= lst[l];
-          colDef.Add(new DataColumn(string.Format("C{0}", l), null != v ? v.GetType() : typeof(object)));
+          colDef.Add(new DataColumn($"C{l}", null != v ? v.GetType() : typeof(object)));
         }
         tabRow.ItemArray= row;
       }

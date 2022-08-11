@@ -101,16 +101,16 @@ namespace Tlabs.CalcNgn.Parser {
     /// Die unter CommandTokens definierten Begriffe werden nur dann gefunden wenn diese mit diesem Präfix versehen sind.
     /// </summary>
     public const String COMMAND_PREFIX = "@";
- 
-    private String[] aCommands= null;
+
+    readonly String[] aCommands;
     private const char ELEM_BRACKET_OPEN ='(';
     private const char ELEM_BRACKET_CLOSE =')';
     private const char ELEM_DELIMITER =',';
     private const char ELEM_DOUBLE_QUOTE ='"';
     private const char ELEM_ESCAPE ='\\';
 
-    private String code;
-    private IDictionary<String, IList<string>> dicCommands= new Dictionary<String, IList<string>>(StringComparer.InvariantCultureIgnoreCase);
+    readonly String code;
+    readonly IDictionary<String, IList<string>> dicCommands= new Dictionary<String, IList<string>>(StringComparer.InvariantCultureIgnoreCase);
     internal static readonly ILogger log= App.Logger<CmdTokenizer>();
 
     /// <summary>
@@ -195,7 +195,7 @@ namespace Tlabs.CalcNgn.Parser {
       StringBuilder sbParam = new StringBuilder((woprefix ? "" : COMMAND_PREFIX)).Append(sCommand).Append('(');
       if (Params != null) {
         foreach (object param in Params)
-          sbParam.Append(Enum.GetName(param.GetType(), param)).Append(",");
+          sbParam.Append(Enum.GetName(param.GetType(), param)).Append(',');
         if (sbParam[sbParam.Length - 1] == ',') sbParam.Length -= 1;
       }
       return sbParam.Append(')').ToString();
@@ -206,7 +206,7 @@ namespace Tlabs.CalcNgn.Parser {
       int offset= 0;
 
       for (int i= 0; (i < aCommands.Length && offset < code.Length); i++) {
-        offset= code.IndexOf(COMMAND_PREFIX, offset);
+        offset= code.IndexOf(COMMAND_PREFIX, offset, StringComparison.Ordinal);
         if (offset == -1) break;
         offset= parseCommand(offset + COMMAND_PREFIX.Length);
       }
