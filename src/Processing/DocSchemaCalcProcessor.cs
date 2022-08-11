@@ -13,7 +13,7 @@ namespace Tlabs.Data.Processing.Intern {
   /// <summary><see cref="DocSchemaProcessor"/> to perform <see cref="Calculator.Model"/> specific document computation(s).</summary>
   internal class DocSchemaCalcProcessor : DocSchemaProcessor {
 
-    private Calculator.Model calcNgnModel;
+    readonly Calculator.Model calcNgnModel;
 
     /// <summary>Ctor from <paramref name="compSchema"/>, <paramref name="docSeri"/> and <paramref name="calcNgn"/>.</summary>
     public DocSchemaCalcProcessor(ICompiledDocSchema compSchema, IDynamicSerializer docSeri, Calculator calcNgn)
@@ -50,9 +50,8 @@ namespace Tlabs.Data.Processing.Intern {
     private void SaveModel(string path) {
       if (null == calcNgnModel) return;
       new DirectoryInfo(Path.GetDirectoryName(path)).Create();  //ensure path
-      using (var strm = File.Create(path)) {
-        calcNgnModel.Definition.WriteStream(strm);
-      }
+      using var strm= File.Create(path);
+      calcNgnModel.Definition.WriteStream(strm);
     }
 
 

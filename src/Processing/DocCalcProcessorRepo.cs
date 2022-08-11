@@ -6,8 +6,7 @@ namespace Tlabs.Data.Processing {
 
   ///<summary>Repository of <see cref="Intern.DocSchemaCalcProcessor"/>.</summary>
   internal class DocCalcProcessorRepo : Intern.AbstractDocProcRepo {
-    private Tlabs.CalcNgn.Calculator calcNgn;
-    private static readonly BasicCache<string, IDocSchemaProcessor> schemaCache= new BasicCache<string, IDocSchemaProcessor>();
+    readonly Tlabs.CalcNgn.Calculator calcNgn;
 
     ///<summary>Ctor from services.</summary>
     public DocCalcProcessorRepo(Repo.IDocSchemaRepo schemaRepo,

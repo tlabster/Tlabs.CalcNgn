@@ -12,11 +12,11 @@ using Tlabs.CalcNgn.Intern;
 namespace Tlabs.CalcNgn.Sgear {
   using DataDictionary= IDictionary<string, object>;
 
-  /// <summary>Impl. of a <see cref="Intern.ICalcNgnModelDef"/>.</summary>
-  public class CalcNgnModelDef : Intern.ICalcNgnModelDef {
+  /// <summary>Impl. of a <see cref="ICalcNgnModelDef"/>.</summary>
+  public sealed class CalcNgnModelDef : ICalcNgnModelDef {
     private IWorkbook wbk;
     private string namedValPrefix= "WEB_";
-    private IReadOnlyDictionary<string, IModelExport> exports;
+    readonly IReadOnlyDictionary<string, IModelExport> exports;
     private CalcNgnModelDef(IWorkbook wbk, IDictionary<string, IModelImport> imp, IDictionary<string, IModelExport> exp) {
       this.wbk= wbk;
       this.Imports= new ReadOnlyDictionary<string, IModelImport>(imp);
@@ -66,17 +66,18 @@ namespace Tlabs.CalcNgn.Sgear {
 #else
       for (int l = 0, n = wbk.Names.Count; l < n; ++l) try {
           var rngName= wbk.Names[l];
-          if (!(rngKey= rngName.Name).StartsWith(this.namedValPrefix)
+          if (!(rngKey= rngName.Name).StartsWith(this.namedValPrefix, StringComparison.Ordinal)
               || null == (rng= rngName.RefersToRange)) continue;
-          object namedVal;
-          if (namedVals.TryGetValue(rngKey.Substring(this.namedValPrefix.Length), out namedVal))
+          if (namedVals.TryGetValue(rngKey.Substring(this.namedValPrefix.Length), out var namedVal))
             rng.Value= namedVal;
           else
             rng.ClearContents();
-      }
+        }
 #endif
       catch (Exception e) {
+#pragma warning disable CA1508
         if (null == e) throw;
+#pragma warning restore CA1508
         App.Logger<CalcNgnModelDef>().LogWarning("Problem setting value in range: '{key}' ({msg})", rngKey, e.Message);
       }
 
@@ -116,11 +117,16 @@ namespace Tlabs.CalcNgn.Sgear {
 
       /// <inheritdoc/>
       public void Dispose() {
-        var wbs= this.wbSet;
-        if (null != wbs) {
-          wbs.Workbooks.Close(); //close all
-          this.wbSet= wbs= null;
-        }
+        Dispose(true);
+        GC.SuppressFinalize(this);
+      }
+
+      /// <summary>Do dispose.</summary>
+      protected virtual void Dispose(bool disposing) {
+        if (!disposing || null == wbSet) return;
+        wbSet.Workbooks.Close(); //close all
+        wbSet.Dispose();
+        wbSet= null;
       }
 
     }
@@ -134,10 +140,8 @@ namespace Tlabs.CalcNgn.Sgear {
 
       /// <inheritdoc/>
       public ICalcNgnModelDef ParseModelStream(Stream modelStream) {
-        IDictionary<string, IModelImport> imp;
-        IDictionary<string, IModelExport> exp;
         var wbk= wbSet.Workbooks.OpenFromStream(modelStream);
-        this.ParseWorkbook(wbk, out imp, out exp);
+        this.ParseWorkbook(wbk, out var imp, out var exp);
         return new CalcNgnModelDef(wbk, imp, exp);
       }
 

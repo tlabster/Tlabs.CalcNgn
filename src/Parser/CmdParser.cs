@@ -19,15 +19,15 @@ namespace Tlabs.CalcNgn.Parser {
   /// löst ein <see cref="CommandFoundEventHandler">Event</see> aus wenn dieser Begriff in dem String gefunden wurde.
   /// </summary>
   public class CmdParser {
-    private Type cmdEnumType;
-    private Dictionary<String, RegEvent> dicRegEV= null;
+    readonly Type cmdEnumType;
+    private Dictionary<String, RegEvent> dicRegEV;
 
     ///<summary>Default ctor</summary>
     public CmdParser() : this(typeof(CommandTokens)) { }
 
     ///<summary>Ctor from <paramref name="cmdEnumType"/></summary>
     public CmdParser(Type cmdEnumType) {
-      if (null == (this.cmdEnumType= cmdEnumType)) throw new ArgumentNullException("cmdEnumType");
+      if (null == (this.cmdEnumType= cmdEnumType)) throw new ArgumentNullException(nameof(cmdEnumType));
       init();
     }
 
@@ -54,12 +54,11 @@ namespace Tlabs.CalcNgn.Parser {
     ///<param name="column">int</param>
     ///<param name="row">int</param>
     public void parse(String txt, int column, int row){
-      CmdTokenizer p= new CmdTokenizer(cmdEnumType, txt);
+      var p= new CmdTokenizer(cmdEnumType, txt);
       var dicResult= p.CommandDictionary;
 
       foreach (KeyValuePair<String, RegEvent> kvp in dicRegEV) {
-        IList<string> lParam= null;
-        if (!dicResult.TryGetValue(kvp.Key, out lParam)) continue;
+        if (!dicResult.TryGetValue(kvp.Key, out var lParam)) continue;
         if (kvp.Value.paramList.Count == 0 || kvp.Value.RunOnce) {
           kvp.Value.eventHandler(this, kvp.Key, dicResult, column, row);
         }
@@ -92,7 +91,7 @@ namespace Tlabs.CalcNgn.Parser {
 
       foreach (KeyValuePair<String, IList<string>> kvp in dicResult) {
         if (dicRegEV.ContainsKey(kvp.Key)) continue;
-        RegEvent rev= new RegEvent(kvp.Value, ev, runonce);
+        var rev= new RegEvent(kvp.Value, ev, runonce);
         dicRegEV.Add(kvp.Key, rev);
       }
     }
@@ -122,9 +121,9 @@ namespace Tlabs.CalcNgn.Parser {
   ///</summary>
   class RegEvent {
 
-    private IList<string> lParam= null;
-    private CommandFoundEventHandler ev= null;
-    private Boolean runonce;
+    readonly IList<string> lParam;
+    readonly CommandFoundEventHandler ev;
+    readonly Boolean runonce;
 
     public RegEvent(IList<string> lparam, CommandFoundEventHandler evc, Boolean runonce) {
       this.lParam= lparam;

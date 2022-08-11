@@ -14,18 +14,19 @@ namespace Tlabs.CalcNgn.Sgear {
   internal static class DataTableRangeExtension {
     private static readonly ILogger<Intern.ICalcNgnModelParser> log= App.Logger<Intern.ICalcNgnModelParser>();
 
-    private static IFormatProvider FRMP= System.Globalization.CultureInfo.InvariantCulture;
-    private static List<string> ERRmap;
+    readonly static IFormatProvider FRMP= System.Globalization.CultureInfo.InvariantCulture;
+    readonly static List<string> ERRmap;
     static DataTableRangeExtension() {
-      ERRmap= new List<string>(new string[32]);
-      ERRmap[(int)ValueError.None]= null;
-      ERRmap[(int)ValueError.Div0]= "#DIV/0!";
-      ERRmap[(int)ValueError.NA]= "#N/A";
-      ERRmap[(int)ValueError.Name]= "#NMAE?";
-      ERRmap[(int)ValueError.Null]= "#NULL!";
-      ERRmap[(int)ValueError.Num]= "#NUM!";
-      ERRmap[(int)ValueError.Ref]= "#REF!";
-      ERRmap[(int)ValueError.Value]= "#VALUE!";
+      ERRmap= new List<string>(new string[32]) {
+        [(int)ValueError.None]= null,
+        [(int)ValueError.Div0]= "#DIV/0!",
+        [(int)ValueError.NA]=   "#N/A",
+        [(int)ValueError.Name]= "#NMAE?",
+        [(int)ValueError.Null]= "#NULL!",
+        [(int)ValueError.Num]=  "#NUM!",
+        [(int)ValueError.Ref]=  "#REF!",
+        [(int)ValueError.Value]="#VALUE!"
+      };
     }
 
     public static void CopyFromDataTable(this IRange rng, DataTable data, bool insertRows, bool hasHeader) {
@@ -110,6 +111,7 @@ namespace Tlabs.CalcNgn.Sgear {
 
       if (hasHeader) {
         hdrRow= startRow++;
+        #pragma warning disable IDE0059 //keep NRows consistent
         --nRows;
       }
 
@@ -127,23 +129,12 @@ namespace Tlabs.CalcNgn.Sgear {
         for (int c= startCol, ci= 0; c < endCol; ++c, ++ci) {
           var cell= cells[r, c];
           IConvertible val= null;
-          if (null != cell) switch (cell.Type) {
-            case CellType.Text: 
-              val= cell.Text;
-            break;
-
-            case CellType.Number:
-              val= cell.Number;
-            break;
-
-            case CellType.Logical:
-              val= cell.Logical;
-            break;
-
-            default:
-              val= ERRmap[(int)cell.Error];
-            break;
-          }
+          if (null != cell) val= cell.Type switch {
+            CellType.Text     => cell.Text,
+            CellType.Number   => cell.Number,
+            CellType.Logical  => cell.Logical,
+            _                 => ERRmap[(int)cell.Error],
+          };
           tabRow[ci]= val;    //val?.ToString(CultureInfo.InvariantCulture);
         }
       }
