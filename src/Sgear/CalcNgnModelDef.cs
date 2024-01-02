@@ -85,7 +85,7 @@ namespace Tlabs.CalcNgn.Sgear {
 
     ///<inheritdoc/>
     public void Dispose() {
-      if (null != wbk) wbk.Close();
+      wbk?.Close();
       wbk= null;
     }
 

@@ -77,7 +77,7 @@ namespace Tlabs.CalcNgn {
 
       ///<inheritdoc/>
       public void Dispose() {
-        if (null != modelDef) modelDef.Dispose();
+        modelDef?.Dispose();
         modelDef= null;
       }
     }//clas Model
