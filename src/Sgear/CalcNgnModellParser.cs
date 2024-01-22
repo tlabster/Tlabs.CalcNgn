@@ -66,7 +66,7 @@ namespace Tlabs.CalcNgn.Sgear {
     private static readonly string EXPORT_PATTERN= Parser.CmdTokenizer.GetCommand(TemplateDirectives.DATA_EXPORT);
 
     /// <summary>Ctor from <paramref name="culture"/>.</summary>
-    public CalcNgnModelParser(CultureInfo culture= null, string licKey= null) : base(culture, licKey) { }
+    public CalcNgnModelParser(CultureInfo? culture= null, string? licKey= null) : base(culture, licKey) { }
 
     /// <inheritdoc/>
     protected override void ParseWorkbook(IWorkbook wbk, out IDictionary<string, IModelImport> imp, out IDictionary<string, IModelExport> exp) {
@@ -78,15 +78,15 @@ namespace Tlabs.CalcNgn.Sgear {
     private class ParsedWbk {
       public IDictionary<string, IModelImport> impDefs= new Dictionary<string, IModelImport>();
       public IDictionary<string, IModelExport> expDefs= new Dictionary<string, IModelExport>();
-      private IWorksheet currSheet;
+      private IWorksheet currSheet= null!;
 
       public ParsedWbk(IWorkbook wbk) {
         CommentParser commentParser= new CommentParser(typeof(TemplateDirectives));
-        commentParser.registerEvent(new Parser.CmdTokenizer(typeof(TemplateDirectives), IMPORT_PATTERN), ParseImportCmd, true);
+        commentParser.registerEvent(new Parser.CmdTokenizer(typeof(TemplateDirectives), IMPORT_PATTERN), parseImportCmd, true);
 #if Shape_support
         commentParser.registerEvent(new Parser.CmdTokenizer(typeof(TemplateDirectives), SHAPE_PATTERN), OnShapeCmd, true);
 #endif
-        commentParser.registerEvent(new Parser.CmdTokenizer(typeof(TemplateDirectives), EXPORT_PATTERN), ParseExportCmd, true);
+        commentParser.registerEvent(new Parser.CmdTokenizer(typeof(TemplateDirectives), EXPORT_PATTERN), parseExportCmd, true);
 
         parse(wbk, commentParser);
       }
@@ -98,15 +98,15 @@ namespace Tlabs.CalcNgn.Sgear {
           for (int rowNo = 0; rowNo < cells.RowCount; ++rowNo) {
             for (int colNo = 0; colNo < cells.ColumnCount; ++colNo) {
               var cell= cells[rowNo, colNo];
-              var com= cell.Comment;
+              var com= cell.Comment?.ToString();
               if (null != com)
-                commentParser.parse(com.ToString(), cell.Row, cell.Column);
+                commentParser.parse(com, cell.Row, cell.Column);
             }
           }
         }
       }
 
-      private void ParseImportCmd(object src, String cmd, IDictionary<String, IList<string>> parserResult, int row, int column) {
+      private void parseImportCmd(object src, String cmd, IDictionary<String, IList<string>> parserResult, int row, int column) {
         var cell= currSheet.Cells[row, column];
         var impParam= parserResult[cmd];
         var minArgCnt= 2;
@@ -154,7 +154,7 @@ namespace Tlabs.CalcNgn.Sgear {
         this.impDefs[impID]= new ImportDef(impID, cell, impType, collCnt, hasHeader);
       }
 
-      public void ParseExportCmd(object src, String cmd, IDictionary<String, IList<string>> parserResult, int row, int col) {
+      public void parseExportCmd(object src, String cmd, IDictionary<String, IList<string>> parserResult, int row, int col) {
         var cell= currSheet.Cells[row, col];
         var param= parserResult[cmd];
         if (param.Count < 2 || param.Count > 3) throw new CalcNgnException($"Wrong arguments number for {cmd} in cell[{cell.Row:D}, {cell.Column:D}]");
@@ -162,22 +162,22 @@ namespace Tlabs.CalcNgn.Sgear {
 
         if (String.IsNullOrWhiteSpace(param[1])) throw new CalcNgnException($"Bad data key {cmd} in cell[{cell.Row:D}, {cell.Column:D}]");
         var dataKey= param[1].Trim();
-        
-        Type targetType= null;
+
+        Type? targetType= null;
         if (param.Count > 2)
           EXPORT_TYPE.TryGetValue(param[2].Trim(), out targetType);
-        
+
         IName rngName= lookupRngName(cell);
 
-        expDefs.Add(dataKey, 
+        expDefs.Add(dataKey,
                     new ExportDef {
                       namedRng= rngName,
                       hasHeader= (DataExportParamTokens.TABLE == expType),
                       type= targetType
-        });
+                    });
       }
 
-      private static IName findInNames(IRange cell, INames names) {
+      private static IName? findInNames(IRange cell, INames names) {
         for (int l = 0; l < names.Count; ++l) {
           var nam= names[l];
           var rng= nam.RefersToRange;
@@ -258,13 +258,13 @@ namespace Tlabs.CalcNgn.Sgear {
          *       a dynamically sized data input range (that initialy must consist of exactly two rows [SpreadsheetGear requirement] !!!).
          *       In this case this 'template' range will be filled with rng.CopyFromDataTable(dataTab, CopyTableFlags.InsertCells),
          *       while any references (from formulas) are getting adjusted accordingly.
-         *       
+         *
          *       If rngRows < 0 that is the result from a previous import into a dynamic template range. In this case the range
          *       must be shrunk to exaactly two rows again for being prepared for rng.CopyFromDataTable(dataTab, CopyTableFlags.InsertCells)...
-         *       
+         *
          * Caution: If the DataTable being imported does not contain at least two rows, the import target range gets shrunk to
          *          less than two rows, making it impossible to further import into this range!!!
-         *       
+         *
          */
         if (rngRows <= 0) {
           int delRows= -rngRows;
@@ -294,13 +294,13 @@ namespace Tlabs.CalcNgn.Sgear {
     }
 
     private class ExportDef : IModelExport {
-      public IName namedRng;
+      public required IName namedRng;
       public bool hasHeader;
-      public Type type;
-      public object Value {
+      public Type? type;
+      public object? Value {
         get {
           IRange rng= namedRng.RefersToRange;
-          object v= null;
+          object? v= null;
           double? num;
           if (null == rng) return v;
 

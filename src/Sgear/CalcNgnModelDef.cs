@@ -10,7 +10,7 @@ using SpreadsheetGear;
 using Tlabs.CalcNgn.Intern;
 
 namespace Tlabs.CalcNgn.Sgear {
-  using DataDictionary= IDictionary<string, object>;
+  using DataDictionary= IDictionary<string, object?>;
 
   /// <summary>Impl. of a <see cref="ICalcNgnModelDef"/>.</summary>
   public sealed class CalcNgnModelDef : ICalcNgnModelDef {
@@ -54,7 +54,7 @@ namespace Tlabs.CalcNgn.Sgear {
 
     /// <inheritdoc/>
     public void ImportNamedValues(DataDictionary namedVals) {
-      IRange rng= null;
+      IRange? rng= null;
       string rngKey= "?";
 #if do_not_set_or_clear_import_ranges
       ISheet sht= wbk.Sheets[0];
@@ -85,8 +85,8 @@ namespace Tlabs.CalcNgn.Sgear {
 
     ///<inheritdoc/>
     public void Dispose() {
-      wbk?.Close();
-      wbk= null;
+      wbk.Close();
+      GC.SuppressFinalize(this);
     }
 
 
@@ -96,7 +96,7 @@ namespace Tlabs.CalcNgn.Sgear {
       protected IWorkbookSet wbSet;
 
       /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
-      protected AbstractModel(CultureInfo culture= null, string licKey= null) {
+      protected AbstractModel(CultureInfo? culture= null, string? licKey= null) {
         try { //ensure licence
           if (null != licKey)
             Factory.SetSignedLicense(licKey);
@@ -123,10 +123,9 @@ namespace Tlabs.CalcNgn.Sgear {
 
       /// <summary>Do dispose.</summary>
       protected virtual void Dispose(bool disposing) {
-        if (!disposing || null == wbSet) return;
+        if (!disposing) return;
         wbSet.Workbooks.Close(); //close all
         wbSet.Dispose();
-        wbSet= null;
       }
 
     }
@@ -136,7 +135,7 @@ namespace Tlabs.CalcNgn.Sgear {
       /// <summary>Logger</summary>
       protected static readonly ILogger log= App.Logger<AbstractModelParser>();
       /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
-      protected AbstractModelParser(CultureInfo culture= null, string licKey= null) : base(culture, licKey) { }
+      protected AbstractModelParser(CultureInfo? culture= null, string? licKey= null) : base(culture, licKey) { }
 
       /// <inheritdoc/>
       public ICalcNgnModelDef ParseModelStream(Stream modelStream) {

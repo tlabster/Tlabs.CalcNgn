@@ -13,14 +13,14 @@ namespace Tlabs.CalcNgn.Parser {
   /// <param name="column">int</param>
   /// <param name="row">int</param>
   public delegate void CommandFoundEventHandler(object Sender, String Command, IDictionary<String, IList<string>> dicParserResult, int column, int row);
-  
+
   /// <summary>
   /// Verwendet den <see cref="CmdTokenizer"/> um ein String nach registrierten Begriffen zu dursuchen und
   /// löst ein <see cref="CommandFoundEventHandler">Event</see> aus wenn dieser Begriff in dem String gefunden wurde.
   /// </summary>
   public class CmdParser {
     readonly Type cmdEnumType;
-    private Dictionary<String, RegEvent> dicRegEV;
+    private Dictionary<String, RegEvent> dicRegEV= null!;
 
     ///<summary>Default ctor</summary>
     public CmdParser() : this(typeof(CommandTokens)) { }
@@ -42,13 +42,13 @@ namespace Tlabs.CalcNgn.Parser {
     public void reset() {
       init();
     }
-    
+
     ///<summary>
     ///Analysiert den als Parameter übergebenen Text.
     ///</summary>
     ///<remarks>
     ///Analysiert den als Parameter übergebenen Text.
-    ///Die Paramter column und row werden als Information an den Event weitergegeben 
+    ///Die Paramter column und row werden als Information an den Event weitergegeben
     ///</remarks>
     ///<param name="txt">txt</param>
     ///<param name="column">int</param>
@@ -64,7 +64,7 @@ namespace Tlabs.CalcNgn.Parser {
         }
         else if (lParam.Count > 0) {
           foreach (String param in lParam) {
-            if (kvp.Value.paramList.Count > 0 
+            if (kvp.Value.paramList.Count > 0
                 && !kvp.Value.paramList.Contains(param)) continue;
             kvp.Value.eventHandler(this, kvp.Key, dicResult, column, row);
           }
@@ -82,7 +82,7 @@ namespace Tlabs.CalcNgn.Parser {
     /// Paremeter werden für die Registrierung berücksichtigt.
     /// Bsp: @AgentInstance(ID,DESC)
     /// Der Event wird jetzt sowohl für ID als auch für DESC ausgelöst.
-    /// </remarks>    
+    /// </remarks>
     /// <param name="p">Parser</param>
     /// <param name="ev">CommandFindEventHandler</param>
     /// <param name="runonce">Boolean - True Der event wird nur einmal aufgerufen und nicht wie sonst für jeden Parameter</param>
@@ -97,7 +97,7 @@ namespace Tlabs.CalcNgn.Parser {
     }
 
     /// <summary>
-    /// Deregistriert einen Event für ein Kommando 
+    /// Deregistriert einen Event für ein Kommando
     /// Das Kommando wird ohne Prefix übergeben.
     /// </summary>
     /// <param name="command">String</param>

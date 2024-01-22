@@ -11,7 +11,7 @@ namespace Tlabs.CalcNgn.Sgear {
   internal static class TableHeaderRangeExtension {
     static readonly ILogger log= App.Logger<ITableData>();
     public static IRange FindTableHeader(this IRange searchArea, IEnumerable<string> header) {
-      var hdrCnt= (header?.Count()).GetValueOrDefault();
+      var hdrCnt= header.Count();
       if (0 == hdrCnt) throw new ArgumentException(nameof(header));
       var hdrCells= new List<IRange>();
       var cell= searchArea[0, 0];    //search start

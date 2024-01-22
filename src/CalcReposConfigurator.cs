@@ -14,18 +14,17 @@ namespace Tlabs.CalcNgn {
   ///<summary>Configures all data repositories as services.</summary>
   public class CalcReposConfigurator : IConfigurator<IServiceCollection> {
     static readonly ILogger log= App.Logger<CalcReposConfigurator>();
-    readonly CultureInfo calcNgnCulture;
-    readonly string calcNgnLicense;
+    readonly CultureInfo? calcNgnCulture;
+    readonly string? calcNgnLicense;
 
 
     ///<summary>Default ctor</summary>
     public CalcReposConfigurator() : this(null) { }
 
     ///<summary>Ctor from <paramref name="config"/>.</summary>
-    public CalcReposConfigurator(IDictionary<string, string> config) {
+    public CalcReposConfigurator(IDictionary<string, string>? config) {
       config??= new Dictionary<string, string>(0);
-      if (config.TryGetValue("culture", out var val))
-        this.calcNgnCulture= new CultureInfo(val);
+      if (config.TryGetValue("culture", out var cul)) this.calcNgnCulture= new CultureInfo(cul);
       config.TryGetValue("licKey", out this.calcNgnLicense);
     }
 
@@ -38,6 +37,6 @@ namespace Tlabs.CalcNgn {
       log.LogDebug("Calc. repository services added.");
     }
 
-    
+
   }
 }

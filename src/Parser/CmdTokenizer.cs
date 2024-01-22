@@ -33,11 +33,11 @@ namespace Tlabs.CalcNgn.Parser {
   };
 
   /// <summary>
-  /// Mögliche Parameter für die Begriffe die unter 
-  ///  CommandTokens.Agent 
-  ///  CommandTokens.Trigger 
-  ///  CommandTokens.AgentTemplateRef 
-  ///  CommandTokens.TriggerTemplateRef 
+  /// Mögliche Parameter für die Begriffe die unter
+  ///  CommandTokens.Agent
+  ///  CommandTokens.Trigger
+  ///  CommandTokens.AgentTemplateRef
+  ///  CommandTokens.TriggerTemplateRef
   /// definiert wurden.
   /// </summary>
   public enum TemplateParamTokens : int {
@@ -110,7 +110,7 @@ namespace Tlabs.CalcNgn.Parser {
     private const char ELEM_ESCAPE ='\\';
 
     readonly String code;
-    readonly IDictionary<String, IList<string>> dicCommands= new Dictionary<String, IList<string>>(StringComparer.InvariantCultureIgnoreCase);
+    readonly Dictionary<String, IList<string>> dicCommands= new Dictionary<String, IList<string>>(StringComparer.InvariantCultureIgnoreCase);
     internal static readonly ILogger log= App.Logger<CmdTokenizer>();
 
     /// <summary>
@@ -155,23 +155,11 @@ namespace Tlabs.CalcNgn.Parser {
     }
 
     /// <summary>
-    /// Erstellt auf Basis der Enum Typen ein Kommando
-    /// </summary>
-    /// <param name="cmdToken"><see cref="CommandTokens"/></param>
-    /// <returns></returns>
-    public static String GetCommand(Enum cmdToken)
-    {
-      return GetCommand(cmdToken, null);
-    }
-
-    /// <summary>
     /// Gibt den Namen eines CommandTokens zurück.
     /// </summary>
     /// <param name="eCommand">Enum</param>
     /// <returns>String</returns>
-    public static String GetCommandTokensName(Enum eCommand){
-      return Enum.GetName(eCommand.GetType(), eCommand);
-    }
+    public static String GetCommandTokensName(Enum eCommand) => eCommand.ToString();
 
     /// <summary>
     /// Erstellt auf Basis der Enum Typen ein Kommando
@@ -217,7 +205,7 @@ namespace Tlabs.CalcNgn.Parser {
 
       for (int i= offset; i < code.Length; i++) {
         if (code[i] != ELEM_BRACKET_OPEN) continue;
-        
+
         String sCommand= code.Substring(offset, i - offset).Trim();
         if (aCommands.Contains<String>(sCommand, StringComparer.InvariantCultureIgnoreCase)) {
           var lParam= new List<string>();
@@ -231,7 +219,7 @@ namespace Tlabs.CalcNgn.Parser {
       return offset;
     }
 
-    private int parseParam(int offset, IList<string> lParam) {
+    private int parseParam(int offset, List<string> lParam) {
 
       int lastMatch= offset;
       bool bCloseBracketFound= false;
