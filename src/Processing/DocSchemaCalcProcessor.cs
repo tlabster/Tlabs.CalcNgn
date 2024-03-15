@@ -13,12 +13,13 @@ namespace Tlabs.Data.Processing.Intern {
   /// <summary><see cref="DocSchemaProcessor"/> to perform <see cref="Calculator.Model"/> specific document computation(s).</summary>
   internal class DocSchemaCalcProcessor : DocSchemaProcessor {
 
-    readonly Calculator.Model calcNgnModel;
+    readonly Calculator.Model? calcNgnModel;
 
     /// <summary>Ctor from <paramref name="compSchema"/>, <paramref name="docSeri"/> and <paramref name="calcNgn"/>.</summary>
     public DocSchemaCalcProcessor(ICompiledDocSchema compSchema, IDynamicSerializer docSeri, Calculator calcNgn)
     : base(compSchema, docSeri) {
-      if (null == calcNgn) throw new ArgumentNullException(nameof(calcNgn));
+      ArgumentNullException.ThrowIfNull(calcNgn);
+      if (null == Schema.CalcModelStream) throw new InvalidOperationException($"Schema does not have any {nameof(Schema.CalcModelStream)}");
 
       if (Schema.HasCalcModel) {    // check calc model
         this.calcNgnModel= calcNgn.LoadModel(Schema.CalcModelStream);
@@ -30,18 +31,18 @@ namespace Tlabs.Data.Processing.Intern {
     }
 
     ///<summary>Perform any calc. model specific computation(s).</summary>
-    protected override object processBodyObject(object bodyObj, Func<object, IDictionary<string, object>> setupData) {
+    protected override object processBodyObject(object bodyObj, Func<object, IDictionary<string, object?>>? setupData) {
       if (null == calcNgnModel) return bodyObj;
       lock(calcNgnModel) {
         var model=   null != setupData
                   ? setupData(bodyObj)
                   : BodyAccessor.ToDictionary(bodyObj);
 #if DEBUG
-        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", Schema.TypeName + "0.xls"));
+        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath)??"", "calcNgnModel", Schema.TypeName + "0.xls"));
 #endif
         calcNgnModel.Compute(model);
 #if DEBUG
-        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath), "calcNgnModel", Schema.TypeName + ".xls"));
+        SaveModel(Path.Combine(Path.GetDirectoryName(App.MainEntryPath)??"", "calcNgnModel", Schema.TypeName + ".xls"));
 #endif
         return bodyObj;
       }
@@ -49,7 +50,7 @@ namespace Tlabs.Data.Processing.Intern {
 
     private void SaveModel(string path) {
       if (null == calcNgnModel) return;
-      new DirectoryInfo(Path.GetDirectoryName(path)).Create();  //ensure path
+      new DirectoryInfo(Path.GetDirectoryName(path)??"").Create();  //ensure path
       using var strm= File.Create(path);
       calcNgnModel.Definition.WriteStream(strm);
     }

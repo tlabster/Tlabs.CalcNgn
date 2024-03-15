@@ -22,7 +22,7 @@ namespace Tlabs.CalcNgn.Util {
       foreach (object jobj in lst) {
         DataRow tabRow= table.NewRow();
 
-        if (jobj is IDictionary<string, object> dict)
+        if (jobj is IDictionary<string, object?> dict)
           rowFromDictionary(tabRow, dict, tabCols);
         else
           rowFromList(tabRow, jobj, tabCols);
@@ -33,14 +33,14 @@ namespace Tlabs.CalcNgn.Util {
       return table;
     }
 
-    private static void rowFromDictionary(DataRow tabRow, IDictionary<string, object> dict, DataColumnCollection colDef) {
+    private static void rowFromDictionary(DataRow tabRow, IDictionary<string, object?> dict, DataColumnCollection? colDef) {
       if (null == dict) return;
 
       if (null != colDef) {
         /* Setup table schema (columns) from first list entry
          * and also add first data row:
          */
-        var row= new object[dict.Count];
+        var row= new object?[dict.Count];
         int l= 0;
         foreach (var prop in dict) {
           colDef.Add(new DataColumn(prop.Key, null != prop.Value ? prop.Value.GetType() : typeof(object)));
@@ -52,7 +52,7 @@ namespace Tlabs.CalcNgn.Util {
         tabRow[prop.Key]= prop.Value ?? DBNull.Value;
     }
 
-    private static void rowFromList(DataRow tabRow, object obj, DataColumnCollection colDef) {
+    private static void rowFromList(DataRow tabRow, object obj, DataColumnCollection? colDef) {
       if (obj is not IList<object> lst) return;
 
       if (null != colDef) {

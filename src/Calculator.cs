@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Tlabs.Misc;
 
 namespace Tlabs.CalcNgn {
-  using DataDictionary= IDictionary<string, object>;
+  using DataDictionary= IDictionary<string, object?>;
 
   /// <summary>Calculation Engine</summary>
   public class Calculator {
@@ -37,15 +37,15 @@ namespace Tlabs.CalcNgn {
       /// <summary>Model data.</summary>
 #pragma warning disable CA2227
       public DataDictionary Data {
-      get => ExportInto(new Dictionary<string, object>());
+        get => ExportInto(new Dictionary<string, object?>());
         set {
           /* ** For each import cell:
              Try to resolve the import cell key with the given data (in value).
              If the resolved value is null or key could not be resolved, val == null. Null as Input value causes the cell to be set as 'empty'...
            */
           foreach (var imp in modelDef.Imports) {
-            value.TryResolveValue(imp.Key, out var val, out var _);
-            imp.Value.Input(val);
+            if (value.TryResolveValue(imp.Key, out var val, out var _))
+              imp.Value.Input(val);
           }
         }
       }
@@ -53,7 +53,7 @@ namespace Tlabs.CalcNgn {
 
       /// <summary>Exports model (data) into provided <paramref name="data"/>.</summary>
       public DataDictionary ExportInto(DataDictionary data) {
-        object xVal = null;
+        object? xVal= null;
         foreach (var exp in modelDef.Exports) try {
           xVal= exp.Value.Value;  //poke value from cell
           /*** Place cell value into into target data (dictionary):
@@ -77,8 +77,8 @@ namespace Tlabs.CalcNgn {
 
       ///<inheritdoc/>
       public void Dispose() {
-        modelDef?.Dispose();
-        modelDef= null;
+        modelDef.Dispose();
+        GC.SuppressFinalize(this);
       }
     }//clas Model
   } //class CalcNgn

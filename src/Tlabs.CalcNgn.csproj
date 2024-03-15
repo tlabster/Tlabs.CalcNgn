@@ -1,39 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>2.1.4</VersionPrefix>
-    <TargetFramework>net6.0</TargetFramework>
+    <VersionPrefix>2.2.1</VersionPrefix>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <!--<RuntimeFrameworkVersion>6.0.1</RuntimeFrameworkVersion>-->
+    <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>6</AnalysisLevel>
-    <AnalysisMode>Recommended</AnalysisMode>
-    <AnalysisModeSecurity>All</AnalysisModeSecurity>
-    <AnalysisModeReliability>All</AnalysisModeReliability>
-    <AnalysisModeUsage>All</AnalysisModeUsage>
-    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
-    <AnalysisModeNaming>None</AnalysisModeNaming>
-    <!--
-    <AnalysisLevel>6-recommended</AnalysisLevel>
-    -->
 
     <Description>The Tlabs calculation engine module.</Description>
     <Authors>Tlabs</Authors>
+
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisModeSecurity>All</AnalysisModeSecurity>
+    <AnalysisModeNaming>None</AnalysisModeNaming>
+    <AnalysisModeReliability>All</AnalysisModeReliability>
+    <AnalysisModeUsage>All</AnalysisModeUsage>
+    <AnalysisModeMaintainability>All</AnalysisModeMaintainability>
   </PropertyGroup>
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/tlabster/tlabs.clcng</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.*" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.*" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.*" />
 
     <PackageReference Include="SpreadsheetGear" Version="8.1.*" />
   </ItemGroup>
@@ -41,6 +37,8 @@
   <ItemGroup>
     <ProjectReference Include="../../Tlabs.Core/src/Tlabs.Core.csproj" />
     <ProjectReference Include="../../Tlabs.Data/src/Tlabs.Data.csproj" />
+
+    <None Include="../README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
 </Project>

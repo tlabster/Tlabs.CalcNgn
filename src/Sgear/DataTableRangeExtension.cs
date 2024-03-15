@@ -15,9 +15,9 @@ namespace Tlabs.CalcNgn.Sgear {
     private static readonly ILogger<Intern.ICalcNgnModelParser> log= App.Logger<Intern.ICalcNgnModelParser>();
 
     readonly static IFormatProvider FRMP= System.Globalization.CultureInfo.InvariantCulture;
-    readonly static List<string> ERRmap;
+    readonly static List<string?> ERRmap;
     static DataTableRangeExtension() {
-      ERRmap= new List<string>(new string[32]) {
+      ERRmap= new List<string?>(new string[32]) {
         [(int)ValueError.None]= null,
         [(int)ValueError.Div0]= "#DIV/0!",
         [(int)ValueError.NA]=   "#N/A",
@@ -30,7 +30,7 @@ namespace Tlabs.CalcNgn.Sgear {
     }
 
     public static void CopyFromDataTable(this IRange rng, DataTable data, bool insertRows, bool hasHeader) {
-      if (null == data) throw new ArgumentNullException(nameof(data));
+      ArgumentNullException.ThrowIfNull(data);
 
       int nCols= Math.Min(data.Columns.Count, rng.ColumnCount);
       int nRows= data.Rows.Count;
@@ -38,7 +38,7 @@ namespace Tlabs.CalcNgn.Sgear {
       int startRow= rng.Row;
       int hdrRow= startRow -1;
       IValues cells= (IValues)rng.Worksheet;
-      var hdr= new List<string>(rng.ColumnCount);
+      var hdr= new List<string?>(rng.ColumnCount);
 
       if (hasHeader) {
         if (hdrRow < 0) throw new ArgumentException("No header above range.");
@@ -73,19 +73,19 @@ namespace Tlabs.CalcNgn.Sgear {
           var cv= cells[r, c];
           if (null != cv && cv.HasFormula) continue; //fill non-formula cells only
           var ci= c-startCol;
-          var val= (hasHeader ? (null != hdr[ci] ? row[hdr[ci]] : null) : row[ci]) as IConvertible;
+          var val= (hasHeader ? (null != hdr[ci] ? row[hdr[ci]!] : null) : row[ci]) as IConvertible;
           var tc= val?.GetTypeCode();
 
-          if (tc >= TypeCode.SByte && tc <= TypeCode.Decimal)
+          if (null == val)
+            cells.Clear(r, c);
+          else if (tc >= TypeCode.SByte && tc <= TypeCode.Decimal)
             cells.SetNumber(r, c, val.ToDouble(FRMP));
           else if (tc == TypeCode.Boolean)
             cells.SetLogical(r, c, (bool)val);
           else if (tc == TypeCode.DateTime)
             cells.SetNumber(r, c, rng.Worksheet.Workbook.DateTimeToNumber((DateTime)val));
-          else if (null != val)
-            cells.SetText(r, c, val.ToString());
           else
-            cells.Clear(r, c);
+            cells.SetText(r, c, val.ToString());
         }
       }
     }
@@ -128,7 +128,7 @@ namespace Tlabs.CalcNgn.Sgear {
         table.Rows.Add(tabRow);
         for (int c= startCol, ci= 0; c < endCol; ++c, ++ci) {
           var cell= cells[r, c];
-          IConvertible val= null;
+          IConvertible? val= null;
           if (null != cell) val= cell.Type switch {
             CellType.Text     => cell.Text,
             CellType.Number   => cell.Number,

@@ -10,11 +10,11 @@ namespace Tlabs.CalcNgn.Sgear {
 /// <summary>Table data provider.</summary>
 public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
     /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
-    public TableDataProvider(CultureInfo culture= null, string licKey= null) : base(culture, licKey) {  }
+    public TableDataProvider(CultureInfo? culture= null, string? licKey= null) : base(culture, licKey) {  }
 
     /// <summary>Read data marked with <paramref name="header"/> from <paramref name="dataStream"/>.</summary>
     public object[,] ReadDataWithHeader(Stream dataStream, IEnumerable<string> header) {
-      IWorkbook wbk= null;
+      IWorkbook? wbk= null;
       try {
         wbk= wbSet.Workbooks.OpenFromStream(dataStream);
         if (wbk.Worksheets.Count != 1) throw EX.New<CalcNgnModelException>("Invalid worksheet count: {cnt}", wbk.Worksheets.Count);
@@ -36,7 +36,7 @@ public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
     class RowData : IRowData {
       readonly object[,] data;
       readonly IEnumerable<string> header;
-      IReadOnlyDictionary<string, int> hdrIdx;
+      IReadOnlyDictionary<string, int>? hdrIdx;
       public RowData(object[,] data, IEnumerable<string> header) {
         this.data= data;
         this.header= header;
@@ -51,8 +51,8 @@ public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
           var idx= 0;
           return hdrIdx??= header.ToDictionary(hdr => hdr, _=> idx++);  //defer index creation on demand
         }
-      } 
+      }
     }
-    
+
   }
 }

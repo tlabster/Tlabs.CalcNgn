@@ -28,7 +28,7 @@ namespace Tlabs.CalcNgn.Intern {
     /// The cells of prefixed named ranges that are not matching any named value are cleared!
     /// </para>
     /// </remarks>
-    void ImportNamedValues(IDictionary<string, object> namedVals);
+    void ImportNamedValues(IDictionary<string, object?> namedVals);
     /// <summary>Prefix of named range name(s) to be considered with <see cref="ImportNamedValues(IDictionary{string, object})"/>.</summary>
     string NamedValuesPrefix { get; set; }
 
@@ -43,6 +43,6 @@ namespace Tlabs.CalcNgn.Intern {
   /// <summary><see cref="Calculator.Model"/> export interface.</summary>
   public interface IModelExport {
     /// <summary>Export value.</summary>
-    object Value { get; }
+    object? Value { get; }
   }
 }
