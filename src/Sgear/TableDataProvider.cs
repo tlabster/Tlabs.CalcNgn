@@ -7,12 +7,14 @@ using SpreadsheetGear;
 
 namespace Tlabs.CalcNgn.Sgear {
 
-/// <summary>Table data provider.</summary>
-public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
+  /// <summary>I<see cref="ITableData"/> implementation for spreadsheet data.</summary>
+  /// <remarks>Uitlity to extract tabular (either 2D-array or a <see cref="IRowData"/> from a spreadsheet file given as a <see cref="Stream"/>.
+  /// </remarks>
+  public class TableDataProvider : CalcNgnModelDef.AbstractModel, ITableData {
     /// <summary>Ctor from optional <paramref name="culture"/> and <paramref name="licKey"/>.</summary>
     public TableDataProvider(CultureInfo? culture= null, string? licKey= null) : base(culture, licKey) {  }
 
-    /// <summary>Read data marked with <paramref name="header"/> from <paramref name="dataStream"/>.</summary>
+    ///<inheritdoc/>
     public object[,] ReadDataWithHeader(Stream dataStream, IEnumerable<string> header) {
       IWorkbook? wbk= null;
       try {

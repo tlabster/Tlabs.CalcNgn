@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Xunit;
 using SpreadsheetGear;
 
@@ -23,7 +24,14 @@ namespace Tlabs.CalcNgn.Tests {
       cells["B1"].Formula= "B1";
       cells["B2"].Formula= "B2";
       cells["C1"].Formula= "C1";
-      wbk.SaveAs("d:\\tst0.xls", FileFormat.Excel8);
+
+      cells["D1"].Formula= cells["D1"].AbsolutAddr();
+      Assert.Equal("$D$1", cells["D1"].Text);
+      cells["E1"].Formula= cells.SheetAddress();
+      Assert.NotEmpty(cells["E1"]);
+
+      var modelPath= Path.Combine(App.ContentRoot, "calcngnRngTst01.xls");
+      wbk.SaveAs(modelPath, FileFormat.Excel8);
       rowCnt= wks.UsedRange.RowCount;
 
       // Insert two rows before row 2.
@@ -67,7 +75,8 @@ namespace Tlabs.CalcNgn.Tests {
       cells["C10"].Formula= "C10";
       cells["C11"].Formula= "C11";
 
-      wbk.SaveAs("d:\\tst0.xls", FileFormat.Excel8);
+      var modelPath= Path.Combine(App.ContentRoot, "calcngnRngTst02.xls");
+      wbk.SaveAs(modelPath, FileFormat.Excel8);
 
 
       var rng= cells["C5:E7"];

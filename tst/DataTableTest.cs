@@ -3,7 +3,6 @@ using System.Data;
 using System.Globalization;
 
 using Xunit;
-using SpreadsheetGear;
 
 using Tlabs.CalcNgn.Sgear;
 namespace Tlabs.CalcNgn.Tests {

@@ -9,6 +9,8 @@ using Tlabs.Misc;
 using Tlabs.CalcNgn.Util;
 
 namespace Tlabs.CalcNgn.Tests {
+  using System.Linq;
+
   using Xunit;
 
   public class CalcNgnTest {
@@ -16,13 +18,25 @@ namespace Tlabs.CalcNgn.Tests {
     public static string CALCNGN_LIC= Environment.GetEnvironmentVariable("SPREADSHEETGEAR-LICENSE");
     private Calculator cngn= new Calculator(new Sgear.CalcNgnModelParser(null, CALCNGN_LIC));
 
-    static DataTable TABvals= new List<object> {
+    internal static DataTable TABvals= new List<object> {
         new Dictionary<string, object> {["prop01"]= 1.1, ["prop02"]= "Aaaa", ["frml"]= "dummy", ["prop03"]= 10.0},
         new Dictionary<string, object> {["prop01"]= 2.2, ["prop02"]= "Bbbb", ["frml"]= "dummy", ["prop03"]= 20.0},
         new Dictionary<string, object> {["prop01"]= 3.3, ["prop02"]= "Cccc", ["frml"]= "dummy", ["prop03"]= 30.0},
         new Dictionary<string, object> {["prop01"]= 4.4, ["prop02"]= "Dddd", ["frml"]= "dummy", ["prop03"]= 40.0}
       }.AsDataTable();
 
+
+    [Fact]
+    public void AsDataTableTest() {
+      var rowList= new List<IList<object>>();
+      for (var rno= 0; rno < TABvals.Rows.Count; ++rno) rowList.Add(TABvals.Rows[rno].ItemArray.ToList());
+      var tab= rowList.AsDataTable();
+      Assert.Equal(TABvals.Rows.Count, tab.Rows.Count);
+      Assert.Equal(TABvals.Columns.Count, tab.Columns.Count);
+      for (var rno = 0; rno < TABvals.Rows.Count; ++rno)
+        for (var cno = 0; cno < TABvals.Columns.Count; ++cno)
+          Assert.Equal(TABvals.Rows[rno][cno], tab.Rows[rno][cno]);
+    }
 
     [Fact]
     public void RangeImpTest() {
@@ -104,7 +118,7 @@ namespace Tlabs.CalcNgn.Tests {
       Assert.Equal(double.Parse(row[2].ToString()), double.Parse(row[0].ToString()) + double.Parse(row[3].ToString()));
     }
 
-    private Stream createCalcSheet(bool withColumnSpec= true) {
+    internal static Stream createCalcSheet(bool withColumnSpec= true) {
       MemoryStream strm= new MemoryStream(20 * 1024);
       IWorkbook wbk= Factory.GetWorkbook();
       IWorksheet wks= wbk.Worksheets[0];
